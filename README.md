@@ -11,7 +11,6 @@ All of them will have a helping force pushing towards the center of the head of 
 STEPS TO IMPLEMENT THE PROJECT:
 - simulation
 - features
-- 
 
 PERFORMANCE METRICS:
 - kill per minute (average time per kill)
