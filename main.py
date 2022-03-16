@@ -1,19 +1,20 @@
 import numpy as np
 import pygame
 import random
-from pyhapi import Board, Device, Mechanisms
 import sys, serial, glob
 from serial.tools import list_ports
 import time
-from pantograph import Pantograph
+
+from haply_code.pyhapi import Board, Device, Mechanisms
+from haply_code.pantograph import Pantograph
 
 pygame.init() # start pygame
 window = pygame.display.set_mode((800, 600)) # create a window (size in pixels)
 window.fill((255,255,255)) # white background
 xc, yc = window.get_rect().center # window center
 pygame.display.set_caption('shooting targets')
-#image = pygame.image.load('danger.jpeg')
-#image = pygame.transform.scale(image, (50, 50))
+image = pygame.image.load('image/terrorist.png')
+image = pygame.transform.scale(image, (50, 50))
 
 font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
 text = font.render('KILLS: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
@@ -105,8 +106,8 @@ while run:
     text = font.render('KILLS: '+ str(count), True, (255, 0, 0), (255, 255, 255))
     
     window.blit(text, textRect)
-    pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
-    # window.blit(image, (x_rand-25, y_rand-25))
+    #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
+    window.blit(image, (x_rand-25, y_rand-25))
     pygame.display.flip() # update display
     
     
