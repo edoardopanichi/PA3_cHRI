@@ -151,13 +151,13 @@ while run:
         device.device_write_torques()
         #pause for 1 millisecond
         time.sleep(0.001)
-    else:
-        ######### Update the positions according to the forces ########
-        ##Compute simulation (here there is no inertia)
-        ##If the haply is connected xm=xh and dxh = 0
-        dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
-        dxh = dxh*window_scale
-        xh = np.round(xh+dxh)             ##update new positon of the end effector
+    # else:
+    #     ######### Update the positions according to the forces ########
+    #     ##Compute simulation (here there is no inertia)
+    #     ##If the haply is connected xm=xh and dxh = 0
+    #     dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
+    #     dxh = dxh*window_scale
+    #     xh = np.round(xh+dxh)             ##update new positon of the end effector
         
     
     
