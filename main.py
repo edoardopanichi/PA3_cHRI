@@ -341,12 +341,9 @@ while run:
             window.blit(imageTarget, (int(target.pos[0])-25, int(target.pos[1])-25))
             target.update_pos()
     
-    
-    
-    pygame.display.flip() # update display
-    
     # plot gun
     window.blit(imageGun, imageGunRect)
+    
     pygame.display.flip() # update display
     
     '''
