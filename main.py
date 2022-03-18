@@ -195,18 +195,109 @@ startscreen = True
 endscreen = False
 setTimer = 0
 while run:
+    '''*********** STARTSCREEN ***********'''
+    while startscreen:  
+        for event in pygame.event.get(): # interrupt function
+            if event.type == pygame.QUIT: # force quit with closing the window
+                startscreen = False
+                setTimer = 1
+                run = False
+            elif event.type == pygame.KEYUP:
+                if event.key == ord('q'): # force quit with q button
+                    startscreen = False
+                    setTimer = 1
+                    run = False
+                if event.key == ord('s'): # select sniper
+                    setTimer = 1
+                    gun = "sniper"
+                    startscreen = False
+                if event.key == ord('r'): # select rifle
+                    setTimer = 1
+                    gun = "rifle"
+                    startscreen = False
+                if event.key == ord('p'): # select pistol
+                    setTimer = 1
+                    gun = "pistol"
+                    startscreen = False
+        
+        # real-time plotting
+        window.fill((255,255,255)) # clear window
+    
+        # plot text to screen
+        window.blit(title, titleRect)
+        window.blit(textChoice, textChoiceRect)
+        window.blit(textSniper1, textSniper1Rect)
+        window.blit(textSniper2, textSniper2Rect)
+        window.blit(textRifle1, textRifle1Rect)
+        window.blit(textRifle2, textRifle2Rect)
+        window.blit(textPistol1, textPistol1Rect)
+        window.blit(textPistol2, textPistol2Rect)
+        
+        # plot images
+        window.blit(imageSniper, imageSniperRect)
+        window.blit(imageRifle, imageRifleRect)
+        window.blit(imagePistol, imagePistolRect)
+        #window.blit(image, (xc-25, yc-150))
+        pygame.display.flip() # update display
+    '''*********** !STARTSCREEN ***********'''    
+    
+    
+    
+    '''************* TASK *************'''
     for event in pygame.event.get(): # interrupt function
         if event.type == pygame.QUIT: # force quit with closing the window
             run = False
         elif event.type == pygame.KEYUP:
             if event.key == ord('q'): # force quit with q button
                 run = False
-            if event.key == ord('c'): # force quit with q button
+            if event.key == pygame.K_SPACE: # force quit with q button
                 xm,ym = pygame.mouse.get_pos()
+                bulletCount += 1
                 for target in target_list:
                     if np.sqrt((xm-int(target.pos[0]))**2 + (ym -int(target.pos[1]))**2)<radius:
                         target.hit=True
-
+                        killCount += 1
+                    
+    # start timer
+    if setTimer == 1:
+        timerStart = time.perf_counter()
+        timerEnd = timerStart + timeCountdown  # define time of timer
+        setTimer = 0
+        killCount = 0
+        bulletCount = 0
+    
+    # end timer
+    if  time.perf_counter() >= timerEnd:
+        endscreen = True
+    
+    countdown = round(timerEnd-time.perf_counter(), 1)
+    
+    
+    if gun == 'sniper':
+        # define the features of the gun
+        # ...
+        # change gun image
+        imageGun = imageSniperSmall
+        imageGunRect = imageSniperSmall.get_rect()
+        imageGunRect.topright = (795, 5)
+    
+    if gun == 'rifle':
+        # define the features of the gun
+        # ...
+        # change gun image
+        imageGun = imageRifleSmall
+        imageGunRect = imageRifleSmall.get_rect()
+        imageGunRect.topright = (795, 5)
+    
+    if gun == 'pistol':
+        # define the features of the gun
+        # ...
+        # change gun image
+        imageGun = imagePistolSmall
+        imageGunRect = imagePistolSmall.get_rect()
+        imageGunRect.topright = (795, 5)
+    
+    
     ##Get endpoint position xh
     if port and haplyBoard.data_available():    ##If Haply is present
         #Waiting for the device to be available
