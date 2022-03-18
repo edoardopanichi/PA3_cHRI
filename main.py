@@ -43,7 +43,7 @@ xc, yc = window.get_rect().center # window center
 fe = np.zeros(2)
 
 target_list=[]
-for i in range(5):
+for i in range(50):
     target = Target(True)
     target_list.append(target)
 
@@ -99,43 +99,7 @@ else:
 
 run = True
 while run:
-    for event in pygame.event.get(): # interrupt function
-        if event.type == pygame.QUIT: # force quit with closing the window
-            run = False
-        elif event.type == pygame.KEYUP:
-            if event.key == ord('q'): # force quit with q button
-                run = False
-            if event.key == ord('c'): # force quit with q button
-                xm, ym = pygame.mouse.get_pos()
-                if np.sqrt((xm-x_rand)**2 + (ym - y_rand)**2)<radius:
-                    x_rand = random.randint(50, 750)
-                    y_rand = random.randint(50, 300)
-                    count += 1
 
-                
-    ##Get endpoint position xh
-    if port and haplyBoard.data_available():    ##If Haply is present
-        #Waiting for the device to be available
-        #########Read the motorangles from the board#########
-        device.device_read_data()
-        motorAngle = device.get_device_angles()
-        
-        #########Convert it into position#########
-        device_position = device.get_device_position(motorAngle)
-        xh = np.array(device_position) * 1e3 * window_scale
-        xh[0] = np.round(-xh[0] + 300)
-        xh[1] = np.round(xh[1] - 60)
-        
-         
-    else:
-        # ##Compute distances and forces between blocks
-        # xh = np.clip(np.array(haptic.center),0,599)
-        # xh = np.round(xh)
-        
-        ##Get mouse position
-        mouse_pos = pygame.mouse.get_pos()
-        xh = np.clip(np.array(mouse_pos), 0, 599)
-        
     for event in pygame.event.get(): # interrupt function
         if event.type == pygame.QUIT: # force quit with closing the window
             run = False
@@ -148,7 +112,28 @@ while run:
                     if np.sqrt((xm-int(target.pos[0]))**2 + (ym -int(target.pos[1]))**2)<radius:
                         target.hit=True
 
-                
+    ##Get endpoint position xh
+    if port and haplyBoard.data_available():    ##If Haply is present
+        #Waiting for the device to be available
+        #########Read the motorangles from the board#########
+        device.device_read_data()
+        motorAngle = device.get_device_angles()
+        
+        #########Convert it into position#########
+        device_position = device.get_device_position(motorAngle)
+        xh = np.array(device_position) * 1e3 * window_scale
+        xh[0] = np.round(-xh[0] + 300)
+        xh[1] = np.round(xh[1] - 60)
+         
+    else:
+        # ##Compute distances and forces between blocks
+        # xh = np.clip(np.array(haptic.center),0,599)
+        # xh = np.round(xh)
+        
+        ##Get mouse position
+        mouse_pos = pygame.mouse.get_pos()
+        xh = np.clip(np.array(mouse_pos), 0, 599)
+        
     
     
     # real-time plotting
