@@ -130,7 +130,7 @@ b = 1
 killCount = 0
 bulletCount = 0
 gun = "empty"
-timeCountdown = 5
+timeCountdown = 15
 
 fe = np.zeros(2)
 
@@ -241,7 +241,26 @@ while run:
         pygame.display.flip() # update display
     '''*********** !STARTSCREEN ***********'''    
     
-    
+    '''ACQUIRING THE POSITION FROM THE HAPLY IF CONNECTED, FROM THE MOUSE OTHERWISE'''
+    ##Get endpoint/mouse position xh
+    if port and haplyBoard.data_available():    ##If Haply is present
+        #Waiting for the device to be available
+        #########Read the motorangles from the board#########
+        device.device_read_data()
+        motorAngle = device.get_device_angles()
+        
+        #########Convert it into position#########
+        device_position = device.get_device_position(motorAngle)
+        xh = np.array(device_position) * 1e3 * window_scale
+        xh[0] = np.round(-xh[0] + 300)
+        xh[1] = np.round(xh[1] - 60)
+         
+    else:
+        ##Get mouse position
+        mouse_pos = pygame.mouse.get_pos()
+        xh = np.clip(np.array(mouse_pos), 0, 599)
+        
+    print("\nposition of mouse or haply:", xh)
     
     '''************* TASK *************'''
     for event in pygame.event.get(): # interrupt function
@@ -251,11 +270,10 @@ while run:
             if event.key == ord('q'): # force quit with q button
                 run = False
             if event.key == pygame.K_SPACE: # force quit with q button
-                xm,ym = pygame.mouse.get_pos()
                 bulletCount += 1
                 for target in target_list:
-                    if np.sqrt((xm-int(target.pos[0]))**2 + (ym -int(target.pos[1]))**2)<radius:
-                        target.hit=True
+                    if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
+                        target.hit = True
                         killCount += 1
                     
     # start timer
@@ -298,30 +316,6 @@ while run:
         imageGunRect.topright = (795, 5)
     
     
-    ##Get endpoint position xh
-    if port and haplyBoard.data_available():    ##If Haply is present
-        #Waiting for the device to be available
-        #########Read the motorangles from the board#########
-        device.device_read_data()
-        motorAngle = device.get_device_angles()
-        
-        #########Convert it into position#########
-        device_position = device.get_device_position(motorAngle)
-        xh = np.array(device_position) * 1e3 * window_scale
-        xh[0] = np.round(-xh[0] + 300)
-        xh[1] = np.round(xh[1] - 60)
-         
-    else:
-        # ##Compute distances and forces between blocks
-        # xh = np.clip(np.array(haptic.center),0,599)
-        # xh = np.round(xh)
-        
-        ##Get mouse position
-        mouse_pos = pygame.mouse.get_pos()
-        xh = np.clip(np.array(mouse_pos), 0, 599)
-        
-    print("\nposition of mouse or haply:", xh)
-    
     # real-time plotting
     window.fill((255,255,255)) # clear window
     
@@ -338,18 +332,20 @@ while run:
     for target in target_list:
         if target.hit == False:
             #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-            window.blit(imageTarget, (int(target.pos[0])-25, int(target.pos[1])-25))
+            window.blit(imageTerrorist, (int(target.pos[0])-25, int(target.pos[1])-25))
             target.update_pos()
     
-    
-    
-    pygame.display.flip() # update display
-    
-    # plot gun
+    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
     
-    '''
+    # plot gun
+    # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
+    
+    
+    
+    
+    
      ######### Send forces to the device #########
     if port:
         fe[1] = -fe[1]  ##Flips the force on the Y=axis 
@@ -359,14 +355,14 @@ while run:
         device.device_write_torques()
         #pause for 1 millisecond
         time.sleep(0.001)
-    else:
-        ######### Update the positions according to the forces ########
-        ##Compute simulation (here there is no inertia)
-        ##If the haply is connected xm=xh and dxh = 0
-        dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
-        dxh = dxh*window_scale
-        xh = np.round(xh+dxh)             ##update new positon of the end effector
-    ''' 
+        
+    # else:
+    #     ######### Update the positions according to the forces ########
+    #     ##Compute simulation (here there is no inertia)
+    #     ##If the haply is connected xm=xh and dxh = 0
+    #     dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
+    #     dxh = dxh*window_scale
+    #     xh = np.round(xh+dxh)             ##update new position of the end effector
     
     
     '''************* !TASK *************'''
