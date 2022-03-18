@@ -31,11 +31,11 @@ window_scale = 3 # conversion from meters to pixels. Not sure if we need it
 clock = pygame.time.Clock() # initialise clock
 
 dts = 0.01
-FPS = int(1/dts)
+FPS = int(1 / dts)
 
 # VARIABLES ABOUT ELEMENTS OF THE SIMULATION (targets, forces, CGI elements and so on...)
 x_rand = random.randint(50, 750)
-y_rand = random.randint(50,300)
+y_rand = random.randint(50, 300)
 
 radius = 25
 count = 0
@@ -104,7 +104,7 @@ while run:
                 xm, ym = pygame.mouse.get_pos()
                 if np.sqrt((xm-x_rand)**2 + (ym - y_rand)**2)<radius:
                     x_rand = random.randint(50, 750)
-                    y_rand = random.randint(50,300)
+                    y_rand = random.randint(50, 300)
                     count += 1
 
                 
