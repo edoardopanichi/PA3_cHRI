@@ -4,7 +4,7 @@ import random
 import sys, serial, glob
 from serial.tools import list_ports
 import time
-
+from target import Target
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 
@@ -41,6 +41,11 @@ radius = 25
 count = 0
 xc, yc = window.get_rect().center # window center
 fe = np.zeros(2)
+
+target_list=[]
+for i in range(5):
+    target = Target(True)
+    target_list.append(target)
 
 
 ##################### Detect and Connect Physical device #####################
@@ -94,20 +99,6 @@ else:
 
 run = True
 while run:
-    for event in pygame.event.get(): # interrupt function
-        if event.type == pygame.QUIT: # force quit with closing the window
-            run = False
-        elif event.type == pygame.KEYUP:
-            if event.key == ord('q'): # force quit with q button
-                run = False
-            if event.key == ord('c'): # force quit with q button
-                xm, ym = pygame.mouse.get_pos()
-                if np.sqrt((xm-x_rand)**2 + (ym - y_rand)**2)<radius:
-                    x_rand = random.randint(50, 750)
-                    y_rand = random.randint(50,300)
-                    count += 1
-
-                
     ##Get endpoint position xh
     if port and haplyBoard.data_available():    ##If Haply is present
         #Waiting for the device to be available
@@ -130,6 +121,21 @@ while run:
         ##Get mouse position
         mouse_pos = pygame.mouse.get_pos()
         xh = np.clip(np.array(mouse_pos), 0, 599)
+        
+    for event in pygame.event.get(): # interrupt function
+        if event.type == pygame.QUIT: # force quit with closing the window
+            run = False
+        elif event.type == pygame.KEYUP:
+            if event.key == ord('q'): # force quit with q button
+                run = False
+            if event.key == ord('c'): # force quit with q button
+                xm,ym = pygame.mouse.get_pos()
+                for target in target_list:
+                    if np.sqrt((xm-int(target.pos[0]))**2 + (ym -int(target.pos[1]))**2)<radius:
+                        target.hit=True
+
+                
+    
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
@@ -138,7 +144,14 @@ while run:
     
     window.blit(text, textRect)
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
-    window.blit(image, (x_rand-25, y_rand-25))
+    for target in target_list:
+        if target.hit == False:
+            #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+            window.blit(image, (int(target.pos[0])-25, int(target.pos[1])-25))
+            target.update_pos()
+    
+    
+    
     pygame.display.flip() # update display
     
     
@@ -151,13 +164,13 @@ while run:
         device.device_write_torques()
         #pause for 1 millisecond
         time.sleep(0.001)
-    else:
+    #else:
         ######### Update the positions according to the forces ########
         ##Compute simulation (here there is no inertia)
         ##If the haply is connected xm=xh and dxh = 0
-        dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
-        dxh = dxh*window_scale
-        xh = np.round(xh+dxh)             ##update new positon of the end effector
+        #dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
+        #dxh = dxh*window_scale
+        #xh = np.round(xh+dxh)             ##update new positon of the end effector
         
     
     
