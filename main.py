@@ -39,8 +39,13 @@ y_rand = random.randint(50,300)
 
 radius = 25
 count = 0
+
 xc, yc = window.get_rect().center # window center
+
+k = 1
+b = 1
 fe = np.zeros(2)
+
 
 
 ##################### Detect and Connect Physical device #####################
@@ -130,6 +135,8 @@ while run:
         ##Get mouse position
         mouse_pos = pygame.mouse.get_pos()
         xh = np.clip(np.array(mouse_pos), 0, 599)
+        
+    print("\nposition of mouse or haply:", xh)
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
@@ -151,13 +158,13 @@ while run:
         device.device_write_torques()
         #pause for 1 millisecond
         time.sleep(0.001)
-    else:
-        ######### Update the positions according to the forces ########
-        ##Compute simulation (here there is no inertia)
-        ##If the haply is connected xm=xh and dxh = 0
-        dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
-        dxh = dxh*window_scale
-        xh = np.round(xh+dxh)             ##update new positon of the end effector
+    # else:
+    #     ######### Update the positions according to the forces ########
+    #     ##Compute simulation (here there is no inertia)
+    #     ##If the haply is connected xm=xh and dxh = 0
+    #     dxh = (k/b*(xm-xh)/window_scale - fe/b) ####replace with the valid expression that takes all the forces into account
+    #     dxh = dxh*window_scale
+    #     xh = np.round(xh+dxh) ##update new position of the end effector
         
     
     
