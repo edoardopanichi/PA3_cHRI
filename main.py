@@ -9,7 +9,7 @@ from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 
 ''' DESCRIPTION OF SOME VARIABLE OF THE CODE
-xh -> x and y coordinates of the haptic device (shared between real and virtual panels)
+xh -> x and y coordinates of the haptic device or the mouse otherwise
 '''
 
 
@@ -33,13 +33,14 @@ clock = pygame.time.Clock() # initialise clock
 dts = 0.01
 FPS = int(1/dts)
 
-# VARIABLES ABOUT ELEMENTS OF THE SIMULATION (targets, CGI elements and so on...)
+# VARIABLES ABOUT ELEMENTS OF THE SIMULATION (targets, forces, CGI elements and so on...)
 x_rand = random.randint(50, 750)
 y_rand = random.randint(50,300)
 
 radius = 25
 count = 0
 xc, yc = window.get_rect().center # window center
+fe = np.zeros(2)
 
 
 ##################### Detect and Connect Physical device #####################
@@ -100,14 +101,14 @@ while run:
             if event.key == ord('q'): # force quit with q button
                 run = False
             if event.key == ord('c'): # force quit with q button
-                xm,ym = pygame.mouse.get_pos()
+                xm, ym = pygame.mouse.get_pos()
                 if np.sqrt((xm-x_rand)**2 + (ym - y_rand)**2)<radius:
                     x_rand = random.randint(50, 750)
                     y_rand = random.randint(50,300)
                     count += 1
 
                 
-     ##Get endpoint position xh
+    ##Get endpoint position xh
     if port and haplyBoard.data_available():    ##If Haply is present
         #Waiting for the device to be available
         #########Read the motorangles from the board#########
@@ -116,19 +117,19 @@ while run:
         
         #########Convert it into position#########
         device_position = device.get_device_position(motorAngle)
-        xh = np.array(device_position)*1e3*window_scale
-        xh[0] = np.round(-xh[0]+300)
-        xh[1] = np.round(xh[1]-60)
-        xm = xh     ##Mouse position is not used
+        xh = np.array(device_position) * 1e3 * window_scale
+        xh[0] = np.round(-xh[0] + 300)
+        xh[1] = np.round(xh[1] - 60)
+        
          
     else:
-        ##Compute distances and forces between blocks
-        xh = np.clip(np.array(haptic.center),0,599)
-        xh = np.round(xh)
+        # ##Compute distances and forces between blocks
+        # xh = np.clip(np.array(haptic.center),0,599)
+        # xh = np.round(xh)
         
         ##Get mouse position
-        cursor.center = pygame.mouse.get_pos()
-        xm = np.clip(np.array(cursor.center),0,599)
+        mouse_pos = pygame.mouse.get_pos()
+        xh = np.clip(np.array(mouse_pos), 0, 599)
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
@@ -140,6 +141,24 @@ while run:
     window.blit(image, (x_rand-25, y_rand-25))
     pygame.display.flip() # update display
     
+    
+     ######### Send forces to the device #########
+    if port:
+        fe[1] = -fe[1]  ##Flips the force on the Y=axis 
+        
+        ##Update the forces of the device
+        device.set_device_torques(fe)
+        device.device_write_torques()
+        #pause for 1 millisecond
+        time.sleep(0.001)
+    else:
+        ######### Update the positions according to the forces ########
+        ##Compute simulation (here there is no inertia)
+        ##If the haply is connected xm=xh and dxh = 0
+        dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
+        dxh = dxh*window_scale
+        xh = np.round(xh+dxh)             ##update new positon of the end effector
+        
     
     
     # try to keep it real time with the desired step time
