@@ -4,7 +4,7 @@ import random
 import sys, serial, glob
 from serial.tools import list_ports
 import time
-
+from target import Target
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 
@@ -114,11 +114,11 @@ window_scale = 3 # conversion from meters to pixels. Not sure if we need it
 clock = pygame.time.Clock() # initialise clock
 
 dts = 0.01
-FPS = int(1/dts)
+FPS = int(1 / dts)
 
 # VARIABLES ABOUT ELEMENTS OF THE SIMULATION (targets, forces, CGI elements and so on...)
 x_rand = random.randint(50, 750)
-y_rand = random.randint(50,300)
+y_rand = random.randint(50, 300)
 
 radius = 25
 killCount = 0
@@ -127,6 +127,11 @@ gun = "empty"
 timeCountdown = 5
 
 fe = np.zeros(2)
+
+target_list=[]
+for i in range(5):
+    target = Target(True)
+    target_list.append(target)
 
 
 ##################### Detect and Connect Physical device #####################
@@ -306,6 +311,21 @@ while run:
         ##Get mouse position
         mouse_pos = pygame.mouse.get_pos()
         xh = np.clip(np.array(mouse_pos), 0, 599)
+        
+    for event in pygame.event.get(): # interrupt function
+        if event.type == pygame.QUIT: # force quit with closing the window
+            run = False
+        elif event.type == pygame.KEYUP:
+            if event.key == ord('q'): # force quit with q button
+                run = False
+            if event.key == ord('c'): # force quit with q button
+                xm,ym = pygame.mouse.get_pos()
+                for target in target_list:
+                    if np.sqrt((xm-int(target.pos[0]))**2 + (ym -int(target.pos[1]))**2)<radius:
+                        target.hit=True
+
+                
+    
     
     
     # real-time plotting
@@ -321,8 +341,15 @@ while run:
     
     # plot target
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
-    #window.blit(imageTerrorist, (x_rand-25, y_rand-25))
-    window.blit(imageTarget, (x_rand-25, y_rand-25))
+    for target in target_list:
+        if target.hit == False:
+            #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+            window.blit(imageTarget, (int(target.pos[0])-25, int(target.pos[1])-25))
+            target.update_pos()
+    
+    
+    
+    pygame.display.flip() # update display
     
     # plot gun
     window.blit(imageGun, imageGunRect)

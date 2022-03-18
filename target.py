@@ -8,6 +8,7 @@ class Target:
         self.moving_direction = np.array([random.choice([-1,0,1]),random.choice([-1,0,1])])
         self.speed = random.uniform(0.2,0.5)
         self.pos = x_rand = np.array([random.uniform(50, 750),random.uniform(50,300)])
+        self.hit = False
     
     def update_pos(self):
         self.pos += self.moving_direction*self.speed
@@ -17,7 +18,3 @@ class Target:
     
     
     
-pers = Target(3)
-for i in range(5):
-    pers.printamelo()
-    pers.update_pos()
