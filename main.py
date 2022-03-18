@@ -8,10 +8,15 @@ import time
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 
+''' DESCRIPTION OF SOME VARIABLE OF THE CODE
+xh -> x and y coordinates of the haptic device (shared between real and virtual panels)
+'''
+
+
+# VARIABLES OF SIMULATION ON PYGAME
 pygame.init() # start pygame
 window = pygame.display.set_mode((800, 600)) # create a window (size in pixels)
 window.fill((255,255,255)) # white background
-xc, yc = window.get_rect().center # window center
 pygame.display.set_caption('shooting targets')
 image = pygame.image.load('image/terrorist.png')
 image = pygame.transform.scale(image, (50, 50))
@@ -19,18 +24,22 @@ image = pygame.transform.scale(image, (50, 50))
 font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
 text = font.render('KILLS: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textRect = text.get_rect()
-textRect.topleft = (10, 10) 
+textRect.topleft = (10, 10)
+
+window_scale = 3 # conversion from meters to pixels. Not sure if we need it
 
 clock = pygame.time.Clock() # initialise clock
 
 dts = 0.01
 FPS = int(1/dts)
 
+# VARIABLES ABOUT ELEMENTS OF THE SIMULATION (targets, CGI elements and so on...)
 x_rand = random.randint(50, 750)
 y_rand = random.randint(50,300)
 
 radius = 25
 count = 0
+xc, yc = window.get_rect().center # window center
 
 
 ##################### Detect and Connect Physical device #####################
@@ -98,7 +107,28 @@ while run:
                     count += 1
 
                 
-    
+     ##Get endpoint position xh
+    if port and haplyBoard.data_available():    ##If Haply is present
+        #Waiting for the device to be available
+        #########Read the motorangles from the board#########
+        device.device_read_data()
+        motorAngle = device.get_device_angles()
+        
+        #########Convert it into position#########
+        device_position = device.get_device_position(motorAngle)
+        xh = np.array(device_position)*1e3*window_scale
+        xh[0] = np.round(-xh[0]+300)
+        xh[1] = np.round(xh[1]-60)
+        xm = xh     ##Mouse position is not used
+         
+    else:
+        ##Compute distances and forces between blocks
+        xh = np.clip(np.array(haptic.center),0,599)
+        xh = np.round(xh)
+        
+        ##Get mouse position
+        cursor.center = pygame.mouse.get_pos()
+        xm = np.clip(np.array(cursor.center),0,599)
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
