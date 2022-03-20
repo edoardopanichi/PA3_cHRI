@@ -359,8 +359,9 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.array([1.3*np.sin(2*countdown), 1*np.sin(2*countdown)]) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([2*np.sin(5*countdown), 2*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
+    print("f_perturbance", f_perturbance)
     
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
@@ -369,7 +370,7 @@ while run:
     
     # f_height_map =
     # fe = f_height_map + f_perturbance + f_viscosity
-    fe = f_gravity + f_viscosity #+ f_perturbance
+    fe = f_gravity + f_viscosity + f_perturbance
     
     xh_old = xh # Update xh_old to compute the velocity
     
