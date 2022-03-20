@@ -1,0 +1,8 @@
+ GUN    |   KPM   |   BPM   |   SME   |
+
+pistol      56.0      68.0     39.59
+sniper      60.0      68.0     18.17
+rifle       64.0      72.0     19.94
+pistol      68.0      68.0     12.91
+pistol      52.0      96.0     48.89
+rifle       44.0      48.0     10.54

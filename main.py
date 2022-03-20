@@ -9,6 +9,7 @@ from target import Target
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 from height_map import create_targets, create_civilians
+from save_scores import save_score
 
 ''' DESCRIPTION OF SOME VARIABLE OF THE CODE
 xh -> x and y coordinates of the haptic device or the mouse otherwise
@@ -135,6 +136,10 @@ textSMERect.center = (xc, yc+50)
 textRestart = fontTable.render('Press \'z\' for restart', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textRestartRect = textRestart.get_rect()
 textRestartRect.center = (xc, yc+150)
+
+textSave = fontTable.render('Press \'s\' to save score', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textSaveRect = textSave.get_rect()
+textSaveRect.center = (xc, yc+200)
 
 window_scale = 3 # conversion from meters to pixels. Not sure if we need it
 
@@ -431,20 +436,20 @@ while run:
     target_pos=[]
     for target in target_list:
         #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-        window.blit(imageTerrorist, (int(target.pos[0])-25, int(target.pos[1])-25))
+        #target.update_pos()
+        x_pos = int(target.pos[0])
+        y_pos = int(target.pos[1])
+        if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
+            target.bounce_lr()
+        if 600-y_pos<1+target_radius or y_pos<1+target_radius:
+            target.bounce_tb()
+        
         target.update_pos()
         target_pos.append(target.pos)
-    
+        window.blit(imageTarget, (x_pos-target_radius, y_pos-target_radius))
+        
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
-    x_pos = int(target.pos[0])
-    y_pos = int(target.pos[1])
-    if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
-        target.bounce_lr()
-    if 600-y_pos<1+target_radius or y_pos<1+target_radius:
-        target.bounce_tb()
-    #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-    window.blit(imageTarget, (x_pos-25, y_pos-25))
-    target.update_pos()
+    
     
     
     window.blit(imageCross, (xh[0]-crossSize/2, xh[1]-crossSize/2))
@@ -498,8 +503,14 @@ while run:
     
     
     '''************* !TASK *************'''
-    
-    
+    if endscreen:
+        score_saved = False
+        kills_per_minute = killCount*(60/timeCountdown)
+        bullets_per_minute = bulletCount*(60/timeCountdown)
+        if bulletCount == 0: # to avoid errors due to the division by zero
+            ResultSME = 100000000
+        else:
+            ResultSME =  round(sum(minDistanceList)/bulletCount, 2)
     '''*********** ENDSCRREEN ***********'''
     while endscreen:  
         for event in pygame.event.get(): # interrupt function
@@ -517,6 +528,10 @@ while run:
                     for i in range(target_num):
                         target = Target(True)
                         target_list.append(target)
+                        
+                if event.key == ord('s') and score_saved==False:
+                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME)
+                    score_saved = True
         
         # real-time plotting
         window.fill((255,255,255)) # clear window
@@ -524,26 +539,24 @@ while run:
         # plot text to screen
         window.blit(textScore, textScoreRect)
         
-        textKPM = fontTable.render('Kills per minute: ' + str(killCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textKPM = fontTable.render('Kills per minute: ' + str(kills_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textKPMRect = textKPM.get_rect()
         textKPMRect.center = (xc, yc-50) 
         window.blit(textKPM, textKPMRect)
         
-        textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textBPM = fontTable.render('Bullets per minute: ' + str(bullets_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textBPMRect = textBPM.get_rect()
         textBPMRect.center = (xc, yc)  
         window.blit(textBPM, textBPMRect)
         
-        if bulletCount == 0: # to avoid errors due to the division by zero
-            ResultSME = 100000000
-        else:
-            ResultSME =  round(sum(minDistanceList)/bulletCount, 2)
+        
         textSME = fontTable.render('SME from target center: ' + str(ResultSME) + ' [in pixel]', True, (0, 0, 0), (255, 255, 255)) # printing text object
         textSMERect = textSME.get_rect()
         textSMERect.center = (xc, yc+50)
         window.blit(textSME, textSMERect)
         
         window.blit(textRestart, textRestartRect)
+        window.blit(textSave, textSaveRect)
         
         # plot images
         
