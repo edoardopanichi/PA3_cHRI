@@ -130,7 +130,7 @@ b = 1
 killCount = 0
 bulletCount = 0
 gun = "empty"
-timeCountdown = 150
+timeCountdown = 15
 
 # some variables needed to define the forces
 fe = np.zeros(2)
@@ -138,7 +138,7 @@ xh_old = np.zeros(2)
 velocity_device = np.zeros(2)
 
 target_list=[]
-for i in range(50):
+for i in range(8):
     target = Target(True)
     target_list.append(target)
 
@@ -339,8 +339,14 @@ while run:
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
     for target in target_list:
         if target.hit == False:
+            x_pos = int(target.pos[0])
+            y_pos = int(target.pos[1])
+            if 800-x_pos<1  or x_pos<1:
+                target.bounce_lr()
+            if 600-y_pos<1 or y_pos<1:
+                target.bounce_tb()
             #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-            window.blit(imageTerrorist, (int(target.pos[0])-25, int(target.pos[1])-25))
+            window.blit(imageTerrorist, (x_pos-25, y_pos-25))
             target.update_pos()
     
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
@@ -397,6 +403,10 @@ while run:
                 if event.key == ord('z'): # restart button
                     endscreen = False
                     startscreen = True
+                    target_list=[]
+                    for i in range(8):
+                        target = Target(True)
+                        target_list.append(target)
         
         # real-time plotting
         window.fill((255,255,255)) # clear window
