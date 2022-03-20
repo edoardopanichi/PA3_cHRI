@@ -27,6 +27,10 @@ imageTerrorist = pygame.transform.scale(imageTerrorist, (50, 50))
 imageTarget = pygame.image.load('image/target.png')
 imageTarget = pygame.transform.scale(imageTarget, (50, 50))
 
+crossSize = 250  # int
+imageCross = pygame.image.load('image/cross1.png')
+imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
+
 factor = 0.7  # factor to scale image
 imageSniper = pygame.image.load('image/sniper1.png')
 imageSniper = pygame.transform.scale(imageSniper, (220, 60))
@@ -354,7 +358,9 @@ while run:
             window.blit(imageTerrorist, (x_pos-25, y_pos-25))
             target.update_pos()
     
-    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
+    
+    window.blit(imageCross, (xh[0]-2-crossSize/2, xh[1]-2-crossSize/2))
+    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 3) # draw a green point for aiming
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
     
