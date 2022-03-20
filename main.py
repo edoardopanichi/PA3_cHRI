@@ -7,6 +7,7 @@ import time
 from target import Target
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
+from height_map import create_targets, create_civilians
 
 ''' DESCRIPTION OF SOME VARIABLE OF THE CODE
 xh -> x and y coordinates of the haptic device or the mouse otherwise
@@ -15,7 +16,8 @@ xh -> x and y coordinates of the haptic device or the mouse otherwise
 
 # VARIABLES OF SIMULATION ON PYGAME
 pygame.init() # start pygame
-window = pygame.display.set_mode((800, 600)) # create a window (size in pixels)
+window_dimension = (800, 600)
+window = pygame.display.set_mode(window_dimension) # create a window (size in pixels)
 window.fill((255,255,255)) # white background
 xc, yc = window.get_rect().center # window center
 target_radius = 25
@@ -31,7 +33,7 @@ imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_rad
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
 
-crossSize = 70  # int
+crossSize = 65  # int
 imageCross = pygame.image.load('image/cross2.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
@@ -235,7 +237,7 @@ while run:
                     startscreen = False
         
         # real-time plotting
-        window.fill((255,255,255)) # clear window
+        window.fill((255, 255, 255)) # clear window
     
         # plot text to screen
         window.blit(title, titleRect)
@@ -316,6 +318,7 @@ while run:
         imageGun = imageSniperSmall
         imageGunRect = imageSniperSmall.get_rect()
         imageGunRect.topright = (795, 5)
+        weapon_n = 2
     
     if gun == 'rifle':
         # define the features of the gun
@@ -326,6 +329,7 @@ while run:
         imageGun = imageRifleSmall
         imageGunRect = imageRifleSmall.get_rect()
         imageGunRect.topright = (795, 5)
+        weapon_n = 1
     
     if gun == 'pistol':
         # define the features of the gun
@@ -336,6 +340,7 @@ while run:
         imageGun = imagePistolSmall
         imageGunRect = imagePistolSmall.get_rect()
         imageGunRect.topright = (795, 5)
+        weapon_n = 0
     
     
     # real-time plotting
@@ -352,16 +357,23 @@ while run:
     
     # plot target
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
+    target_pos=[]
     for target in target_list:
-        x_pos = int(target.pos[0])
-        y_pos = int(target.pos[1])
-        if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
-            target.bounce_lr()
-        if 600-y_pos<1+target_radius or y_pos<1+target_radius:
-            target.bounce_tb()
         #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-        window.blit(imageTarget, (x_pos-25, y_pos-25))
+        window.blit(imageTerrorist, (int(target.pos[0])-25, int(target.pos[1])-25))
         target.update_pos()
+        target_pos.append(target.pos)
+    
+    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
+    x_pos = int(target.pos[0])
+    y_pos = int(target.pos[1])
+    if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
+        target.bounce_lr()
+    if 600-y_pos<1+target_radius or y_pos<1+target_radius:
+        target.bounce_tb()
+    #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+    window.blit(imageTarget, (x_pos-25, y_pos-25))
+    target.update_pos()
     
     
     window.blit(imageCross, (xh[0]-crossSize/2, xh[1]-crossSize/2))
@@ -379,9 +391,19 @@ while run:
     # this equivalence is useless, it is here just as a reminder of the force
     f_gravity = f_gravity # check comment of f_viscosity
     
-    # f_height_map =
-    # fe = f_height_map + f_perturbance + f_viscosity
+    print("f_perturbance:", f_perturbance)
+
+    target_array = np.array(target_pos)
+    # civilian_array = np.array(civilian_pos)
+    x_hm, y_hm, z_hm_targets = create_targets(window_dimension, target_array, weapon_n)
+    # x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array, weapon_n)
+    # z_hm = z_hm_targets + z_hm_civilians
+    z_hm = z_hm_targets
+    gradient = np.array(np.gradient(z_hm))
+    f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1e6
+
     fe = f_gravity + f_viscosity + f_perturbance
+    fe = f_height_map
     
     xh_old = xh # Update xh_old to compute the velocity
     
