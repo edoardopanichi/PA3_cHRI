@@ -316,8 +316,8 @@ while run:
                         killCount += 1
                 minDistance = min(distanceList)
                 minDistanceList.append(minDistance)
-                print(minDistanceList)
-                print(sum(minDistanceList)/bulletCount)
+                #print(minDistanceList)
+                #print(sum(minDistanceList)/bulletCount)
                     
     # start timer
     if setTimer == 1:
