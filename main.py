@@ -364,7 +364,7 @@ while run:
         target.update_pos()
     
     
-    window.blit(imageCross, (xh[0]-2-crossSize/2, xh[1]-2-crossSize/2))
+    window.blit(imageCross, (xh[0]-crossSize/2, xh[1]-crossSize/2))
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 3) # draw a green point for aiming
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
