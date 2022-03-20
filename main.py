@@ -43,19 +43,19 @@ imageSniper = pygame.image.load('image/sniper1.png')
 imageSniper = pygame.transform.scale(imageSniper, (220, 60))
 imageSniperSmall = pygame.transform.scale(imageSniper, (int(factor*220), int(factor*60)))
 imageSniperRect = imageSniper.get_rect ()
-imageSniperRect.center = (xc-250, yc+50)
+imageSniperRect.center = (xc-250, yc+30)
 
 imageRifle = pygame.image.load('image/rifle1.png')
 imageRifle = pygame.transform.scale(imageRifle, (180, 90))
 imageRifleSmall = pygame.transform.scale(imageRifle, (int(factor*180), int(factor*90)))
 imageRifleRect = imageRifle.get_rect ()
-imageRifleRect.center = (xc, yc+50)
+imageRifleRect.center = (xc, yc+30)
 
 imagePistol = pygame.image.load('image/pistol1.png')
 imagePistol = pygame.transform.scale(imagePistol, (110, 65))
 imagePistolSmall = pygame.transform.scale(imagePistol, (int(factor*110), int(factor*65)))
 imagePistolRect = imagePistol.get_rect ()
-imagePistolRect.center = (xc+250, yc+50)
+imagePistolRect.center = (xc+250, yc+30)
 
 # Text
 font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
@@ -80,24 +80,40 @@ textChoiceRect.center = (xc, yc-80)
 fontGun = pygame.font.Font('freesansbold.ttf', 20) # printing text font and font size
 textSniper1 = fontGun.render('Sniper', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textSniper1Rect = textSniper1.get_rect()
-textSniper1Rect.center = (xc-250, yc) 
+textSniper1Rect.center = (xc-250, yc-20) 
 textSniper2 = fontGun.render('Press \'s\'', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textSniper2Rect = textSniper2.get_rect()
-textSniper2Rect.center = (xc-250, yc+100) 
+textSniper2Rect.center = (xc-250, yc+80) 
 
 textRifle1 = fontGun.render('Rifle', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textRifle1Rect = textRifle1.get_rect()
-textRifle1Rect.center = (xc, yc)
+textRifle1Rect.center = (xc, yc-20)
 textRifle2 = fontGun.render('Press \'r\'', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textRifle2Rect = textRifle2.get_rect()
-textRifle2Rect.center = (xc, yc+100)
+textRifle2Rect.center = (xc, yc+80)
 
 textPistol1 = fontGun.render('Pistol', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textPistol1Rect = textPistol1.get_rect()
-textPistol1Rect.center = (xc+250, yc)
+textPistol1Rect.center = (xc+250, yc-20)
 textPistol2 = fontGun.render('Press \'p\'', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textPistol2Rect = textPistol2.get_rect()
-textPistol2Rect.center = (xc+250, yc+100)
+textPistol2Rect.center = (xc+250, yc+80)
+
+textRecoil = fontGun.render('Press \'1\' to activate/de-activate recoil', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textRecoilRect = textRecoil.get_rect()
+textRecoilRect.center = (xc, yc+200)
+textActivateGreen = fontGun.render('activate', True, (0, 255, 0), (255, 255, 255)) # printing text object
+textActivateGreenRect = textActivateGreen.get_rect()
+textActivateGreenRect.center = (xc-32, yc+200)
+textActivateRed = fontGun.render('activate', True, (255, 0, 0), (255, 255, 255)) # printing text object
+textActivateRedRect = textActivateRed.get_rect()
+textActivateRedRect.center = (xc-32, yc+200)
+textDeactivateGreen = fontGun.render('de-activate', True, (0, 255, 0), (255, 255, 255)) # printing text object
+textDeactivateGreenRect = textDeactivateGreen.get_rect()
+textDeactivateGreenRect.center = (xc+69, yc+200)
+textDeactivateRed = fontGun.render('de-activate', True, (255, 0, 0), (255, 255, 255)) # printing text object
+textDeactivateRedRect = textDeactivateRed.get_rect()
+textDeactivateRedRect.center = (xc+69, yc+200)
 
 textScore = fontTitle.render('Score', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textScoreRect = textScore.get_rect()
@@ -262,6 +278,13 @@ while run:
         window.blit(textRifle2, textRifle2Rect)
         window.blit(textPistol1, textPistol1Rect)
         window.blit(textPistol2, textPistol2Rect)
+        window.blit(textRecoil, textRecoilRect)
+        if recoil_on == 1:  #recoil is activated
+            window.blit(textActivateGreen, textActivateGreenRect)
+            #window.blit(textDeactivateRed, textDeactivateRedRect)
+        else:  #recoil is de-activated
+            #window.blit(textActivateRed, textActivateRedRect)
+            window.blit(textDeactivateGreen, textDeactivateGreenRect)
         
         # plot images
         window.blit(imageSniper, imageSniperRect)
@@ -270,6 +293,9 @@ while run:
         #window.blit(image, (xc-25, yc-150))
         pygame.display.flip() # update display
     '''*********** !STARTSCREEN ***********'''    
+    
+    if run == False:
+        break
     
     '''ACQUIRING THE POSITION FROM THE HAPLY IF CONNECTED, FROM THE MOUSE OTHERWISE'''
     ##Get endpoint/mouse position xh
