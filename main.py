@@ -132,7 +132,10 @@ bulletCount = 0
 gun = "empty"
 timeCountdown = 150
 
+# some variables needed to define the forces
 fe = np.zeros(2)
+xh_old = np.zeros(2)
+velocity_device = np.zeros(2)
 
 target_list=[]
 for i in range(50):
@@ -252,8 +255,10 @@ while run:
         #########Convert it into position#########
         device_position = device.get_device_position(motorAngle)
         xh = np.array(device_position) * 1e3 * window_scale
-        xh[0] = np.round(-xh[0] + 210) * 1.9
-        xh[1] = np.round(xh[1] - 65) * 1.9
+        xh[0] = np.round(-xh[0] + 210) * 1.9 # we shift and multiply the position read to obtain a situation in which every point of
+        # the window in the game is reachable through a position in the workspace with the haply
+        xh[1] = np.round(xh[1] - 65) * 1.9 # we shift and multiply the position read to obtain a situation in which every point of
+        # the window in the game is reachable through a position in the workspace with the haply
          
     else:
         ##Get mouse position
@@ -293,6 +298,7 @@ while run:
     
     if gun == 'sniper':
         # define the features of the gun
+        f_viscosity = 6*b*velocity_device
         # ...
         # change gun image
         imageGun = imageSniperSmall
@@ -301,6 +307,7 @@ while run:
     
     if gun == 'rifle':
         # define the features of the gun
+        f_viscosity = 3*velocity_device
         # ...
         # change gun image
         imageGun = imageRifleSmall
@@ -309,6 +316,7 @@ while run:
     
     if gun == 'pistol':
         # define the features of the gun
+        f_viscosity = np.zeros(2)
         # ...
         # change gun image
         imageGun = imagePistolSmall
@@ -339,16 +347,20 @@ while run:
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
     
-    # plot gun
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.array([3*np.sin(2*countdown), 3*np.cos(2*countdown)]) # perturbation caused by multiple possible external 
+    f_perturbance = np.array([1.3*np.sin(2*countdown), 1*np.sin(2*countdown)]) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
+    
+    velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
+    f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
+    # this equivalence is useless, it is here just as a reminder of the force
+    
     print("f_perturbance:", f_perturbance)
     # f_height_map =
-    # fe = f_height_map + f_perturbance
-    #fe = f_perturbance
+    # fe = f_height_map + f_perturbance + f_viscosity
+    fe = f_viscosity + f_perturbance
     
-    
+    xh_old = xh # Update xh_old to compute the velocity
     
      ######### Send forces to the device #########
     if port:
