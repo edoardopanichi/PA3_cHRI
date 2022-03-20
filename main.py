@@ -27,8 +27,8 @@ imageTerrorist = pygame.transform.scale(imageTerrorist, (50, 50))
 imageTarget = pygame.image.load('image/target.png')
 imageTarget = pygame.transform.scale(imageTarget, (50, 50))
 
-crossSize = 250  # int
-imageCross = pygame.image.load('image/cross1.png')
+crossSize = 90  # int
+imageCross = pygame.image.load('image/cross2.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
 factor = 0.7  # factor to scale image
@@ -365,7 +365,7 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.multiply(np.array([2*np.sin(5*countdown), 2*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([2*np.sin(1.5*countdown), 1.5*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
     print("f_perturbance", f_perturbance)
     
