@@ -130,7 +130,7 @@ b = 1
 killCount = 0
 bulletCount = 0
 gun = "empty"
-timeCountdown = 15
+timeCountdown = 150
 
 fe = np.zeros(2)
 
@@ -252,13 +252,13 @@ while run:
         #########Convert it into position#########
         device_position = device.get_device_position(motorAngle)
         xh = np.array(device_position) * 1e3 * window_scale
-        xh[0] = np.round(-xh[0] + 300)
-        xh[1] = np.round(xh[1] - 60)
+        xh[0] = np.round(-xh[0] + 210) * 1.9
+        xh[1] = np.round(xh[1] - 65) * 1.9
          
     else:
         ##Get mouse position
         mouse_pos = pygame.mouse.get_pos()
-        xh = np.clip(np.array(mouse_pos), 0, 599)
+        xh = np.clip(np.array(mouse_pos), 0, pygame.display.get_surface().get_width()-1)
         
     print("\nposition of mouse or haply:", xh)
     
@@ -341,8 +341,12 @@ while run:
     
     # plot gun
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    
-    
+    f_perturbance = np.array([3*np.sin(2*countdown), 3*np.cos(2*countdown)]) # perturbation caused by multiple possible external 
+    # factors: wind, hand shaking, etc.
+    print("f_perturbance:", f_perturbance)
+    # f_height_map =
+    # fe = f_height_map + f_perturbance
+    #fe = f_perturbance
     
     
     
