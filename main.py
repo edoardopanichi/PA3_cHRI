@@ -31,7 +31,7 @@ imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_rad
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
 
-crossSize = 70  # int
+crossSize = 90  # int
 imageCross = pygame.image.load('image/cross2.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
