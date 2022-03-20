@@ -31,7 +31,7 @@ imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_rad
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
 
-crossSize = 90  # int
+crossSize = 65  # int
 imageCross = pygame.image.load('image/cross2.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
@@ -370,7 +370,7 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.multiply(np.array([2*np.sin(1.5*countdown), 1.5*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([np.sin(5*countdown) + 1.5, np.sin(5*countdown) + 1.5]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
     print("f_perturbance", f_perturbance)
     
@@ -430,9 +430,9 @@ while run:
     
         # plot text to screen
         window.blit(textScore, textScoreRect)
-        textKPM = fontTable.render('Kills per minute: ' + str(killCount), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textKPM = fontTable.render('Kills per minute: ' + str(killCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
         window.blit(textKPM, textKPMRect)
-        textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
         window.blit(textBPM, textBPMRect)
         window.blit(textSME, textSMERect)
         window.blit(textRestart, textRestartRect)
