@@ -28,8 +28,11 @@ imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*targ
 imageTarget = pygame.image.load('image/target.png')
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
 
+imageBgd1 = pygame.image.load('image/background1.jpg')
+imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
+
 crossSize = 90  # int
-imageCross = pygame.image.load('image/cross2.png')
+imageCross = pygame.image.load('image/cross1.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
 factor = 0.7  # factor to scale image
@@ -337,6 +340,7 @@ while run:
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
+    window.blit(imageBgd1, (0, 0))
     
     # plot time
     textTime = font.render('Time: '+ str(countdown), True, (0, 0, 0), (255, 255, 255))
