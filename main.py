@@ -28,6 +28,10 @@ imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*targ
 imageTarget = pygame.image.load('image/target.png')
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
 
+crossSize = 250  # int
+imageCross = pygame.image.load('image/cross1.png')
+imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
+
 factor = 0.7  # factor to scale image
 imageSniper = pygame.image.load('image/sniper1.png')
 imageSniper = pygame.transform.scale(imageSniper, (220, 60))
@@ -137,6 +141,8 @@ timeCountdown = 15
 fe = np.zeros(2)
 xh_old = np.zeros(2)
 velocity_device = np.zeros(2)
+v = np.random.rand(2) # random vector
+v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
 target_list=[]
 for i in range(8):
@@ -299,7 +305,8 @@ while run:
     
     if gun == 'sniper':
         # define the features of the gun
-        f_viscosity = 6*b*velocity_device
+        f_viscosity = 4*b*velocity_device
+        f_gravity = np.array([0, -10])
         # ...
         # change gun image
         imageGun = imageSniperSmall
@@ -308,7 +315,8 @@ while run:
     
     if gun == 'rifle':
         # define the features of the gun
-        f_viscosity = 3*velocity_device
+        f_viscosity = 1*velocity_device
+        f_gravity = np.array([0, -2.5])
         # ...
         # change gun image
         imageGun = imageRifleSmall
@@ -318,6 +326,7 @@ while run:
     if gun == 'pistol':
         # define the features of the gun
         f_viscosity = np.zeros(2)
+        f_gravity = np.zeros(2)
         # ...
         # change gun image
         imageGun = imagePistolSmall
@@ -350,7 +359,9 @@ while run:
             window.blit(imageTarget, (x_pos-25, y_pos-25))
             target.update_pos()
     
-    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
+    
+    window.blit(imageCross, (xh[0]-2-crossSize/2, xh[1]-2-crossSize/2))
+    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 3) # draw a green point for aiming
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
     
@@ -361,11 +372,11 @@ while run:
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
     # this equivalence is useless, it is here just as a reminder of the force
+    f_gravity = f_gravity # check comment of f_viscosity
     
-    print("f_perturbance:", f_perturbance)
     # f_height_map =
     # fe = f_height_map + f_perturbance + f_viscosity
-    fe = f_viscosity + f_perturbance
+    fe = f_gravity + f_viscosity #+ f_perturbance
     
     xh_old = xh # Update xh_old to compute the velocity
     
