@@ -430,9 +430,9 @@ while run:
     
         # plot text to screen
         window.blit(textScore, textScoreRect)
-        textKPM = fontTable.render('Kills per minute: ' + str(killCount), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textKPM = fontTable.render('Kills per minute: ' + str(killCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
         window.blit(textKPM, textKPMRect)
-        textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
         window.blit(textBPM, textBPMRect)
         window.blit(textSME, textSMERect)
         window.blit(textRestart, textRestartRect)
