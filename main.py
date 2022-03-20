@@ -18,14 +18,15 @@ pygame.init() # start pygame
 window = pygame.display.set_mode((800, 600)) # create a window (size in pixels)
 window.fill((255,255,255)) # white background
 xc, yc = window.get_rect().center # window center
+target_radius = 25
 
 # Images 
 pygame.display.set_caption('shooting targets')
 imageTerrorist = pygame.image.load('image/terrorist.png')
-imageTerrorist = pygame.transform.scale(imageTerrorist, (50, 50))
+imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
 imageTarget = pygame.image.load('image/target.png')
-imageTarget = pygame.transform.scale(imageTarget, (50, 50))
+imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
 
 factor = 0.7  # factor to scale image
 imageSniper = pygame.image.load('image/sniper1.png')
@@ -341,12 +342,12 @@ while run:
         if target.hit == False:
             x_pos = int(target.pos[0])
             y_pos = int(target.pos[1])
-            if 800-x_pos<1  or x_pos<1:
+            if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
                 target.bounce_lr()
-            if 600-y_pos<1 or y_pos<1:
+            if 600-y_pos<1+target_radius or y_pos<1+target_radius:
                 target.bounce_tb()
             #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-            window.blit(imageTerrorist, (x_pos-25, y_pos-25))
+            window.blit(imageTarget, (x_pos-25, y_pos-25))
             target.update_pos()
     
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
