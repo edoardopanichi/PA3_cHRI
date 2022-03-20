@@ -145,7 +145,7 @@ v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
 target_list=[]
-for i in range(8):
+for i in range(2):
     target = Target(True)
     target_list.append(target)
 
@@ -285,7 +285,7 @@ while run:
                 bulletCount += 1
                 for target in target_list:
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
-                        target.hit = True
+                        target.hit()
                         killCount += 1
                     
     # start timer
@@ -348,16 +348,15 @@ while run:
     # plot target
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
     for target in target_list:
-        if target.hit == False:
-            x_pos = int(target.pos[0])
-            y_pos = int(target.pos[1])
-            if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
-                target.bounce_lr()
-            if 600-y_pos<1+target_radius or y_pos<1+target_radius:
-                target.bounce_tb()
-            #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-            window.blit(imageTarget, (x_pos-25, y_pos-25))
-            target.update_pos()
+        x_pos = int(target.pos[0])
+        y_pos = int(target.pos[1])
+        if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
+            target.bounce_lr()
+        if 600-y_pos<1+target_radius or y_pos<1+target_radius:
+            target.bounce_tb()
+        #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+        window.blit(imageTarget, (x_pos-25, y_pos-25))
+        target.update_pos()
     
     
     window.blit(imageCross, (xh[0]-2-crossSize/2, xh[1]-2-crossSize/2))
