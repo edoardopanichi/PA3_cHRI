@@ -130,12 +130,14 @@ b = 1
 killCount = 0
 bulletCount = 0
 gun = "empty"
-timeCountdown = 150
+timeCountdown = 30
 
 # some variables needed to define the forces
 fe = np.zeros(2)
 xh_old = np.zeros(2)
 velocity_device = np.zeros(2)
+v = np.random.rand(2) # random vector
+v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
 target_list=[]
 for i in range(50):
@@ -298,7 +300,8 @@ while run:
     
     if gun == 'sniper':
         # define the features of the gun
-        f_viscosity = 6*b*velocity_device
+        f_viscosity = 4*b*velocity_device
+        f_gravity = np.array([0, -10])
         # ...
         # change gun image
         imageGun = imageSniperSmall
@@ -307,7 +310,8 @@ while run:
     
     if gun == 'rifle':
         # define the features of the gun
-        f_viscosity = 3*velocity_device
+        f_viscosity = 1*velocity_device
+        f_gravity = np.array([0, -2.5])
         # ...
         # change gun image
         imageGun = imageRifleSmall
@@ -317,6 +321,7 @@ while run:
     if gun == 'pistol':
         # define the features of the gun
         f_viscosity = np.zeros(2)
+        f_gravity = np.zeros(2)
         # ...
         # change gun image
         imageGun = imagePistolSmall
@@ -354,11 +359,11 @@ while run:
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
     # this equivalence is useless, it is here just as a reminder of the force
+    f_gravity = f_gravity # check comment of f_viscosity
     
-    print("f_perturbance:", f_perturbance)
     # f_height_map =
     # fe = f_height_map + f_perturbance + f_viscosity
-    fe = f_viscosity + f_perturbance
+    fe = f_gravity + f_viscosity #+ f_perturbance
     
     xh_old = xh # Update xh_old to compute the velocity
     
