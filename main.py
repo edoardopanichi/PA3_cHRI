@@ -366,7 +366,7 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.multiply(np.array([2*np.sin(1.5*countdown), 1.5*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([1*np.sin(5*countdown) + 1.5, 1*np.sin(5*countdown) + 1.5]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
     print("f_perturbance", f_perturbance)
     
