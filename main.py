@@ -31,7 +31,7 @@ imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_rad
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
 
-crossSize = 250  # int
+crossSize = 90  # int
 imageCross = pygame.image.load('image/cross1.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
@@ -370,7 +370,7 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.multiply(np.array([2*np.sin(5*countdown), 2*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([2*np.sin(1.5*countdown), 1.5*np.sin(5*countdown)]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
     print("f_perturbance", f_perturbance)
     
