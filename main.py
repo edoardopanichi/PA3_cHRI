@@ -18,16 +18,20 @@ pygame.init() # start pygame
 window = pygame.display.set_mode((800, 600)) # create a window (size in pixels)
 window.fill((255,255,255)) # white background
 xc, yc = window.get_rect().center # window center
+target_radius = 25
 
 # Images 
 pygame.display.set_caption('shooting targets')
 imageTerrorist = pygame.image.load('image/terrorist.png')
-imageTerrorist = pygame.transform.scale(imageTerrorist, (50, 50))
+imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
 imageTarget = pygame.image.load('image/target.png')
-imageTarget = pygame.transform.scale(imageTarget, (50, 50))
+imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
 
-crossSize = 250  # int
+imageBgd1 = pygame.image.load('image/background1.jpg')
+imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
+
+crossSize = 90  # int
 imageCross = pygame.image.load('image/cross1.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
@@ -143,8 +147,9 @@ velocity_device = np.zeros(2)
 v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
+target_num = 2
 target_list=[]
-for i in range(8):
+for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
@@ -284,7 +289,7 @@ while run:
                 bulletCount += 1
                 for target in target_list:
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
-                        target.hit = True
+                        target.hit()
                         killCount += 1
                     
     # start timer
@@ -335,6 +340,7 @@ while run:
     
     # real-time plotting
     window.fill((255,255,255)) # clear window
+    window.blit(imageBgd1, (0, 0))
     
     # plot time
     textTime = font.render('Time: '+ str(countdown), True, (0, 0, 0), (255, 255, 255))
@@ -347,16 +353,15 @@ while run:
     # plot target
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
     for target in target_list:
-        if target.hit == False:
-            x_pos = int(target.pos[0])
-            y_pos = int(target.pos[1])
-            if 800-x_pos<1  or x_pos<1:
-                target.bounce_lr()
-            if 600-y_pos<1 or y_pos<1:
-                target.bounce_tb()
-            #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-            window.blit(imageTerrorist, (x_pos-25, y_pos-25))
-            target.update_pos()
+        x_pos = int(target.pos[0])
+        y_pos = int(target.pos[1])
+        if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
+            target.bounce_lr()
+        if 600-y_pos<1+target_radius or y_pos<1+target_radius:
+            target.bounce_tb()
+        #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+        window.blit(imageTarget, (x_pos-25, y_pos-25))
+        target.update_pos()
     
     
     window.blit(imageCross, (xh[0]-2-crossSize/2, xh[1]-2-crossSize/2))
@@ -365,8 +370,9 @@ while run:
     pygame.display.flip() # update display
     
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
-    f_perturbance = np.array([1.3*np.sin(2*countdown), 1*np.sin(2*countdown)]) # perturbation caused by multiple possible external 
+    f_perturbance = np.multiply(np.array([1*np.sin(5*countdown) + 1.5, 1*np.sin(5*countdown) + 1.5]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
+    print("f_perturbance", f_perturbance)
     
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
@@ -375,7 +381,7 @@ while run:
     
     # f_height_map =
     # fe = f_height_map + f_perturbance + f_viscosity
-    fe = f_gravity + f_viscosity #+ f_perturbance
+    fe = f_gravity + f_viscosity + f_perturbance
     
     xh_old = xh # Update xh_old to compute the velocity
     
@@ -415,7 +421,7 @@ while run:
                     endscreen = False
                     startscreen = True
                     target_list=[]
-                    for i in range(8):
+                    for i in range(target_num):
                         target = Target(True)
                         target_list.append(target)
         
