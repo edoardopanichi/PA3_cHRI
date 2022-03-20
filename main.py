@@ -4,6 +4,7 @@ import random
 import sys, serial, glob
 from serial.tools import list_ports
 import time
+import math
 from target import Target
 from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
@@ -227,14 +228,17 @@ while run:
                     setTimer = 1
                     gun = "sniper"
                     startscreen = False
+                    minDistanceList = []  # create empty minDistanceList
                 if event.key == ord('r'): # select rifle
                     setTimer = 1
                     gun = "rifle"
                     startscreen = False
+                    minDistanceList = []  # create empty minDistanceList
                 if event.key == ord('p'): # select pistol
                     setTimer = 1
                     gun = "pistol"
                     startscreen = False
+                    minDistanceList = []  # create empty minDistanceList
         
         # real-time plotting
         window.fill((255, 255, 255)) # clear window
@@ -278,7 +282,7 @@ while run:
         mouse_pos = pygame.mouse.get_pos()
         xh = np.clip(np.array(mouse_pos), 0, pygame.display.get_surface().get_width()-1)
         
-    print("\nposition of mouse or haply:", xh)
+    #print("\nposition of mouse or haply:", xh)
     
     '''************* TASK *************'''
     for event in pygame.event.get(): # interrupt function
@@ -289,10 +293,18 @@ while run:
                 run = False
             if event.key == pygame.K_SPACE: # force quit with q button
                 bulletCount += 1
+                distanceList = []  # create empty distance list
                 for target in target_list:
+                    if target.civilian == True:  # CHANGE TO FALSE ???? so it only takes the targets into account
+                        distance = math.sqrt(((target.pos[0]-xh[0])**2)+((target.pos[1]-xh[1])**2))
+                        distanceList.append(distance)
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
                         target.hit()
                         killCount += 1
+                minDistance = min(distanceList)
+                minDistanceList.append(minDistance)
+                print(minDistanceList)
+                print(sum(minDistanceList)/bulletCount)
                     
     # start timer
     if setTimer == 1:
@@ -384,14 +396,14 @@ while run:
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
     f_perturbance = np.multiply(np.array([np.sin(5*countdown) + 1.5, np.sin(5*countdown) + 1.5]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
-    print("f_perturbance", f_perturbance)
+    #print("f_perturbance", f_perturbance)
     
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
     # this equivalence is useless, it is here just as a reminder of the force
     f_gravity = f_gravity # check comment of f_viscosity
     
-    print("f_perturbance:", f_perturbance)
+    #print("f_perturbance:", f_perturbance)
 
     target_array = np.array(target_pos)
     # civilian_array = np.array(civilian_pos)
@@ -452,11 +464,23 @@ while run:
     
         # plot text to screen
         window.blit(textScore, textScoreRect)
+        
         textKPM = fontTable.render('Kills per minute: ' + str(killCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textKPMRect = textKPM.get_rect()
+        textKPMRect.center = (xc, yc-50) 
         window.blit(textKPM, textKPMRect)
+        
         textBPM = fontTable.render('Bullets per minute: ' + str(bulletCount*(60/timeCountdown)), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textBPMRect = textBPM.get_rect()
+        textBPMRect.center = (xc, yc)  
         window.blit(textBPM, textBPMRect)
+        
+        ResultSME =  round(sum(minDistanceList)/bulletCount, 2)
+        textSME = fontTable.render('SME from target center: ' + str(ResultSME) + ' [in pixel]', True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textSMERect = textSME.get_rect()
+        textSMERect.center = (xc, yc+50)
         window.blit(textSME, textSMERect)
+        
         window.blit(textRestart, textRestartRect)
         
         # plot images
