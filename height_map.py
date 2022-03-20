@@ -8,7 +8,7 @@ def create_targets(frame_dimension, target_list, weapon):   # Function to create
     width = frame_dimension[0]  # Get the width of the frame for the meshgrid
     height = frame_dimension[0] # Get the height of the frame for the meshgrid
     
-    x, y = np.mgrid[0:width:1, 0:height:1]   # Create meshgrid
+    x, y = np.mgrid[0:width:5, 0:height:5]   # Create meshgrid
     z = 0   # Initialize z
     pos = np.dstack((x, y)) # Create array of position
     
@@ -25,7 +25,7 @@ def create_civilians(frame_dimension, civilian_list):   # Function to create civ
     width = frame_dimension[0]  # Get the width of the frame for the meshgrid
     height = frame_dimension[0] # Get the height of the frame for the meshgrid
     
-    x, y = np.mgrid[0:width:1, 0:height:1]   # Create meshgrid
+    x, y = np.mgrid[0:width:5, 0:height:5]   # Create meshgrid
     z = 0   # Initialize z
     pos = np.dstack((x, y)) # Create array of position
     
@@ -52,13 +52,13 @@ x, y, z_civilian = create_civilians(frame_dimension, civilian_list)
 z = z_target + z_civilian
 
 # Plot the 2D graph
-fig2d = plt.figure()
-ax2d = fig2d.add_subplot(111)
-ax2d.contourf(x, y, z)
+# fig2d = plt.figure()
+# ax2d = fig2d.add_subplot(111)
+# ax2d.contourf(x, y, z)
 
 # Plot the 3D graph 
-fig3d = plt.figure()
-ax3d = fig3d.gca(projection='3d')
-ax3d.plot_surface(x, y, z, cmap='viridis', linewidth=0)
+# fig3d = plt.figure()
+# ax3d = fig3d.gca(projection='3d')
+# ax3d.plot_surface(x, y, z, cmap='viridis', linewidth=0)
 
 plt.show()
