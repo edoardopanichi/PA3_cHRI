@@ -144,8 +144,9 @@ velocity_device = np.zeros(2)
 v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
+target_num = 2
 target_list=[]
-for i in range(2):
+for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
@@ -416,7 +417,7 @@ while run:
                     endscreen = False
                     startscreen = True
                     target_list=[]
-                    for i in range(8):
+                    for i in range(target_num):
                         target = Target(True)
                         target_list.append(target)
         
