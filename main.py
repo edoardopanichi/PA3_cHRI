@@ -131,12 +131,16 @@ y_rand = random.randint(50, 300)
 radius = 25
 count = 0
 
-xc, yc = window.get_rect().center # window center
 
 k = 1
 b = 1
 killCount = 0
 bulletCount = 0
+
+shooting = False # variable for the recoil, if true a recoil force is implemented
+recoil_duration = 0 # variable used later to select the duration of the force pulse
+recoil_on = 0 # variable to activate or de-active recoil
+
 gun = "empty"
 timeCountdown = 15
 
@@ -221,6 +225,9 @@ while run:
                     startscreen = False
                     setTimer = 1
                     run = False
+                if event.key == ord('1'): # activate recoil
+                    recoil_on = 1
+                    
                 if event.key == ord('s'): # select sniper
                     setTimer = 1
                     gun = "sniper"
@@ -276,7 +283,6 @@ while run:
         mouse_pos = pygame.mouse.get_pos()
         xh = np.clip(np.array(mouse_pos), 0, pygame.display.get_surface().get_width()-1)
         
-    print("\nposition of mouse or haply:", xh)
     
     '''************* TASK *************'''
     for event in pygame.event.get(): # interrupt function
@@ -285,8 +291,10 @@ while run:
         elif event.type == pygame.KEYUP:
             if event.key == ord('q'): # force quit with q button
                 run = False
-            if event.key == pygame.K_SPACE: # force quit with q button
+            if event.key == pygame.K_SPACE: # shoot with 'space' button
                 bulletCount += 1
+                shooting = True
+                recoil_duration = 12
                 for target in target_list:
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
                         target.hit()
@@ -306,11 +314,17 @@ while run:
     
     countdown = round(timerEnd-time.perf_counter(), 1)
     
-    
     if gun == 'sniper':
         # define the features of the gun
         f_viscosity = 4*b*velocity_device
         f_gravity = np.array([0, -10])
+        
+        if shooting or (recoil_duration > 0):
+            f_recoil = np.array([0, 100])
+            recoil_duration -= 1
+            shooting = False
+        else:
+            f_recoil = np.zeros(2)
         # ...
         # change gun image
         imageGun = imageSniperSmall
@@ -321,6 +335,13 @@ while run:
         # define the features of the gun
         f_viscosity = 1*velocity_device
         f_gravity = np.array([0, -2.5])
+        
+        if shooting or (recoil_duration > 0):
+            f_recoil = np.array([0, 5])
+            recoil_duration -= 1
+            shooting = False
+        else:
+            f_recoil = np.zeros(2)
         # ...
         # change gun image
         imageGun = imageRifleSmall
@@ -331,6 +352,13 @@ while run:
         # define the features of the gun
         f_viscosity = np.zeros(2)
         f_gravity = np.zeros(2)
+        
+        if shooting or (recoil_duration > 0):
+            f_recoil = np.array([0, 0])
+            recoil_duration -= 1
+            shooting = False
+        else:
+            f_recoil = np.zeros(2)
         # ...
         # change gun image
         imageGun = imagePistolSmall
@@ -372,7 +400,6 @@ while run:
     # COMPUTING FEEDBACK FORCES AND PERTURBATIONS
     f_perturbance = np.multiply(np.array([np.sin(5*countdown) + 1.5, np.sin(5*countdown) + 1.5]), v_hat) # perturbation caused by multiple possible external 
     # factors: wind, hand shaking, etc.
-    print("f_perturbance", f_perturbance)
     
     velocity_device = ((xh - xh_old)/dts)/(window_scale*1e3) # used for the f_viscosity
     f_viscosity = f_viscosity # the actual calculation of this force is done above where we check which weapon has been chosen.
@@ -381,7 +408,7 @@ while run:
     
     # f_height_map =
     # fe = f_height_map + f_perturbance + f_viscosity
-    fe = f_gravity + f_viscosity + f_perturbance
+    fe =  f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance 
     
     xh_old = xh # Update xh_old to compute the velocity
     
