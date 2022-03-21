@@ -62,11 +62,12 @@ imagePistolRect = imagePistol.get_rect ()
 imagePistolRect.center = (xc+250, yc+30)
 
 # Text
-font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
+font = pygame.font.Font('freesansbold.ttf', 18) # printing text font and font size
 textHits = font.render('Hits: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textHitsRect = textHits.get_rect()
 textHitsRect.topleft = (10, 30)
 
+fontCurrScore = pygame.font.Font('freesansbold.ttf', 25) # printing text font and font size
 textCurrScore = font.render('SCORE:     ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textCurrScoreRect = textCurrScore.get_rect()
 textCurrScoreRect.center = (xc, 15)  
@@ -456,7 +457,7 @@ while run:
     window.blit(imageBgd1, (0, 0))
     
     # plot time
-    textTime = font.render('Time: '+ str(countdown), True, (0, 0, 0))
+    textTime = font.render('Time: '+ str(countdown), True, (255, 0, 0))
     window.blit(textTime, textTimeRect)
     
     # plot kill count
@@ -464,7 +465,7 @@ while run:
     window.blit(textHits, textHitsRect)
     
     #plot current score
-    textCurrScore = font.render('Score: '+ str(score), True, (0, 0, 0))
+    textCurrScore = fontCurrScore.render('Score: '+ str(score), True, (255, 0, 0))
     window.blit(textCurrScore, textCurrScoreRect)
     
     # plot target
