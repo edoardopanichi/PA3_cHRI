@@ -3,9 +3,12 @@ import random
 import pygame
 
 class Target:
-    def __init__(self, civilian=True):
-        self.civilian = civilian 
-        self.moving_direction = np.array([random.choice([-1, 0, 1]), random.choice([-1, 0, 1])])
+    def __init__(self, target=True):
+        self.target = target
+        if not target: 
+            self.moving_direction = np.array([random.choice([-1, 1]), random.choice([-1, 1])])
+        else:
+            self.moving_direction = np.array([random.choice([-1, 0, 1]), random.choice([-1, 0, 1])])
         self.speed = random.uniform(0.5, 1.5)
         self.pos = np.array([random.uniform(50, 750), random.uniform(50, 300)])
     

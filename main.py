@@ -30,8 +30,11 @@ pygame.display.set_caption('shooting targets')
 imageTerrorist = pygame.image.load('image/terrorist.png')
 imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
-imageTarget = pygame.image.load('image/target.png')
+imageTarget = pygame.image.load('image/target.png') 
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
+
+imageCivilian = pygame.image.load('image/civilian1.png') 
+imageCivilian = pygame.transform.scale(imageCivilian, (2*target_radius, 2*target_radius))
 
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
@@ -60,10 +63,15 @@ imagePistolRect = imagePistol.get_rect ()
 imagePistolRect.center = (xc+250, yc+30)
 
 # Text
-font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
+font = pygame.font.Font('freesansbold.ttf', 18) # printing text font and font size
 textHits = font.render('Hits: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textHitsRect = textHits.get_rect()
-textHitsRect.topleft = (10, 30) 
+textHitsRect.topleft = (10, 30)
+
+fontCurrScore = pygame.font.Font('freesansbold.ttf', 25) # printing text font and font size
+textCurrScore = font.render('SCORE:     ', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textCurrScoreRect = textCurrScore.get_rect()
+textCurrScoreRect.center = (xc, 15)  
 
 textTime = font.render('Time: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textTimeRect = textTime.get_rect()
@@ -165,6 +173,7 @@ k = 1
 b = 1
 killCount = 0
 bulletCount = 0
+civilianCount = 0
 
 shooting = False # variable for the recoil, if true a recoil force is implemented
 recoil_duration = 0 # variable used later to select the duration of the force pulse
@@ -269,16 +278,19 @@ while run:
                     setTimer = 1
                     gun = "sniper"
                     startscreen = False
+                    score = 0
                     minDistanceList = []  # create empty minDistanceList
                 if event.key == ord('r'): # select rifle
                     setTimer = 1
                     gun = "rifle"
                     startscreen = False
+                    score = 0
                     minDistanceList = []  # create empty minDistanceList
                 if event.key == ord('p'): # select pistol
                     setTimer = 1
                     gun = "pistol"
                     startscreen = False
+                    score = 0
                     minDistanceList = []  # create empty minDistanceList
         
         # real-time plotting
@@ -343,22 +355,33 @@ while run:
                 run = False
             if event.key == pygame.K_SPACE: # shoot with 'space' button
                 bulletCount += 1
-                
+                hit_smth= False
                 shooting = True
                 recoil_duration = 12
                 
                 distanceList = []  # create empty distance list
                 for target in target_list:
-                    # if target.civilian == False:  # CHANGE TO FALSE ???? so it only takes the targets into account
                     distance = math.sqrt(((target.pos[0]-xh[0])**2)+((target.pos[1]-xh[1])**2))
                     distanceList.append(distance)
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
                         target.hit()
                         killCount += 1
+                        score += 50
+                        hit_smth= True
+                        
                 minDistance = min(distanceList)
                 minDistanceList.append(minDistance)
-                #print(minDistanceList)
-                #print(sum(minDistanceList)/bulletCount)
+                        
+                for civ in civilian_list:
+                    if np.sqrt((xh[0]-int(civ.pos[0]))**2 + (xh[1] -int(civ.pos[1]))**2)<radius:
+                        civ.hit()
+                        civilianCount += 1
+                        score -= 100
+                        hit_smth= True
+                
+                if not hit_smth:
+                    score -= 20
+
                     
     # start timer
     if setTimer == 1:
@@ -367,6 +390,7 @@ while run:
         setTimer = 0
         killCount = 0
         bulletCount = 0
+        civilianCount = 0
     
     # end timer
     if  time.perf_counter() >= timerEnd:
@@ -434,12 +458,16 @@ while run:
     window.blit(imageBgd1, (0, 0))
     
     # plot time
-    textTime = font.render('Time: '+ str(countdown), True, (0, 0, 0), (255, 255, 255))
+    textTime = font.render('Time: '+ str(countdown), True, (255, 0, 0))
     window.blit(textTime, textTimeRect)
     
     # plot kill count
-    textHits = font.render('HITS: '+ str(killCount), True, (255, 0, 0), (255, 255, 255))
+    textHits = font.render('HITS: '+ str(killCount), True, (255, 0, 0))
     window.blit(textHits, textHitsRect)
+    
+    #plot current score
+    textCurrScore = fontCurrScore.render('Score: '+ str(score), True, (255, 0, 0))
+    window.blit(textCurrScore, textCurrScoreRect)
     
     # plot target
     #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
@@ -469,7 +497,7 @@ while run:
             civilian.bounce_tb()
         civilian.update_pos()
         civilian_pos.append(civilian.pos)
-        window.blit(imageTarget, (x_pos - target_radius, y_pos - target_radius))
+        window.blit(imageCivilian, (x_pos - target_radius, y_pos - target_radius))
         
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
     
@@ -541,10 +569,13 @@ while run:
         score_saved = False
         kills_per_minute = killCount*(60/timeCountdown)
         bullets_per_minute = bulletCount*(60/timeCountdown)
+        civilians_per_minute = civilianCount*(60/timeCountdown)
         if bulletCount == 0: # to avoid errors due to the division by zero
             ResultSME = 100000000
         else:
             ResultSME =  round(sum(minDistanceList)/bulletCount, 2)
+            
+        score = score + int(3*1e4/ResultSME)
     '''*********** ENDSCRREEN ***********'''
     while endscreen:  
         for event in pygame.event.get(): # interrupt function
@@ -575,6 +606,9 @@ while run:
         window.fill((255,255,255)) # clear window
     
         # plot text to screen
+        textScore = fontTitle.render('Score:  ' + str(score), True, (0, 0, 0), (255, 255, 255))
+        textScoreRect = textScore.get_rect()
+        textScoreRect.center = (xc, yc-200)
         window.blit(textScore, textScoreRect)
         
         textKPM = fontTable.render('Kills per minute: ' + str(kills_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
@@ -582,7 +616,7 @@ while run:
         textKPMRect.center = (xc, yc-100) 
         window.blit(textKPM, textKPMRect)
         
-        textCPM = fontTable.render('Kills of civilians per minute: ' + str(0), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textCPM = fontTable.render('Kills of civilians per minute: ' + str(civilians_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textCPMRect = textCPM.get_rect()
         textCPMRect.center = (xc, yc-50) 
         window.blit(textCPM, textCPMRect)
