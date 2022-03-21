@@ -119,12 +119,16 @@ textDeactivateRedRect.center = (xc+69, yc+200)
 
 textScore = fontTitle.render('Score', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textScoreRect = textScore.get_rect()
-textScoreRect.center = (xc, yc-175) 
+textScoreRect.center = (xc, yc-200) 
 
 fontTable = pygame.font.Font('freesansbold.ttf', 20) # printing text font and font size
 textKPM = fontTable.render('Kills per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textKPMRect = textKPM.get_rect()
-textKPMRect.center = (xc, yc-50) 
+textKPMRect.center = (xc, yc-100) 
+
+textCPM = fontTable.render('Kills of civilians per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textCPMRect = textCPM.get_rect()
+textCPMRect.center = (xc, yc-50) 
 
 textBPM = fontTable.render('Bullets per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textBPMRect = textBPM.get_rect()
@@ -176,12 +180,17 @@ velocity_device = np.zeros(2)
 v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
-target_num = 2
+target_num = 3
 target_list=[]
 for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
+civilian_num = 2
+civilian_list=[]
+for i in range(civilian_num):
+    civilian = Target(False)
+    civilian_list.append(civilian)
 
 
 ##################### Detect and Connect Physical device #####################
@@ -340,9 +349,9 @@ while run:
                 
                 distanceList = []  # create empty distance list
                 for target in target_list:
-                    if target.civilian == True:  # CHANGE TO FALSE ???? so it only takes the targets into account
-                        distance = math.sqrt(((target.pos[0]-xh[0])**2)+((target.pos[1]-xh[1])**2))
-                        distanceList.append(distance)
+                    # if target.civilian == False:  # CHANGE TO FALSE ???? so it only takes the targets into account
+                    distance = math.sqrt(((target.pos[0]-xh[0])**2)+((target.pos[1]-xh[1])**2))
+                    distanceList.append(distance)
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
                         target.hit()
                         killCount += 1
@@ -444,10 +453,23 @@ while run:
             target.bounce_lr()
         if 600-y_pos<1+target_radius or y_pos<1+target_radius:
             target.bounce_tb()
-        
         target.update_pos()
         target_pos.append(target.pos)
         window.blit(imageTarget, (x_pos-target_radius, y_pos-target_radius))
+
+    civilian_pos=[]
+    for civilian in civilian_list:
+        #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
+        #target.update_pos()
+        x_pos = int(civilian.pos[0])
+        y_pos = int(civilian.pos[1])
+        if 800 - x_pos < 1 + target_radius or x_pos < 1 + target_radius:
+            civilian.bounce_lr()
+        if 600 - y_pos < 1 + target_radius or y_pos < 1 + target_radius:
+            civilian.bounce_tb()
+        civilian.update_pos()
+        civilian_pos.append(civilian.pos)
+        window.blit(imageTarget, (x_pos - target_radius, y_pos - target_radius))
         
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
     
@@ -468,11 +490,12 @@ while run:
     f_gravity = f_gravity # check comment of f_viscosity
     
     target_array = np.array(target_pos)
-    # civilian_array = np.array(civilian_pos)
+    civilian_array = np.array(civilian_pos)
+    print(target_array)
+    print(civilian_array)
     x_hm, y_hm, z_hm_targets = create_targets(window_dimension, target_array, weapon_n)
-    # x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array, weapon_n)
-    # z_hm = z_hm_targets + z_hm_civilians
-    z_hm = z_hm_targets
+    x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array)
+    z_hm = z_hm_targets + z_hm_civilians
     gradient = np.array(np.gradient(z_hm))
     f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1e6
     
@@ -529,6 +552,10 @@ while run:
                     for i in range(target_num):
                         target = Target(True)
                         target_list.append(target)
+                    civilian_list=[]
+                    for i in range(civilian_num):
+                        civilian = Target(False)
+                        civilian_list.append(civilian)
                         
                 if event.key == ord('s') and score_saved==False:
                     save_score(gun,kills_per_minute,bullets_per_minute,ResultSME)
@@ -542,8 +569,13 @@ while run:
         
         textKPM = fontTable.render('Kills per minute: ' + str(kills_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textKPMRect = textKPM.get_rect()
-        textKPMRect.center = (xc, yc-50) 
+        textKPMRect.center = (xc, yc-100) 
         window.blit(textKPM, textKPMRect)
+        
+        textCPM = fontTable.render('Kills of civilians per minute: ' + str(0), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textCPMRect = textCPM.get_rect()
+        textCPMRect.center = (xc, yc-50) 
+        window.blit(textCPM, textCPMRect)
         
         textBPM = fontTable.render('Bullets per minute: ' + str(bullets_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textBPMRect = textBPM.get_rect()
