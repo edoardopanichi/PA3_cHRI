@@ -30,6 +30,7 @@ imageTerrorist = pygame.image.load('image/terrorist.png')
 imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
 imageTarget = pygame.image.load('image/target.png')
+print(pygame.surfarray.pixels3d(imageTarget))  
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
 
 imageBgd1 = pygame.image.load('image/background1.jpg')
