@@ -29,9 +29,11 @@ pygame.display.set_caption('shooting targets')
 imageTerrorist = pygame.image.load('image/terrorist.png')
 imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
-imageTarget = pygame.image.load('image/target.png')
-print(pygame.surfarray.pixels3d(imageTarget))  
+imageTarget = pygame.image.load('image/target.png') 
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
+
+imageCivilian = pygame.image.load('image/Civilian.png') 
+imageCivilian = pygame.transform.scale(imageCivilian, (2*target_radius, 2*target_radius))
 
 imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
@@ -349,14 +351,20 @@ while run:
                 
                 distanceList = []  # create empty distance list
                 for target in target_list:
-                    # if target.civilian == False:  # CHANGE TO FALSE ???? so it only takes the targets into account
                     distance = math.sqrt(((target.pos[0]-xh[0])**2)+((target.pos[1]-xh[1])**2))
                     distanceList.append(distance)
                     if np.sqrt((xh[0]-int(target.pos[0]))**2 + (xh[1] -int(target.pos[1]))**2)<radius:
                         target.hit()
                         killCount += 1
+                        
                 minDistance = min(distanceList)
                 minDistanceList.append(minDistance)
+                        
+                for civ in civilian_list:
+                    if np.sqrt((xh[0]-int(civ.pos[0]))**2 + (xh[1] -int(civ.pos[1]))**2)<radius:
+                        civ.hit()
+                        
+                
                 #print(minDistanceList)
                 #print(sum(minDistanceList)/bulletCount)
                     
@@ -469,7 +477,7 @@ while run:
             civilian.bounce_tb()
         civilian.update_pos()
         civilian_pos.append(civilian.pos)
-        window.blit(imageTarget, (x_pos - target_radius, y_pos - target_radius))
+        window.blit(imageCivilian, (x_pos - target_radius, y_pos - target_radius))
         
     pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
     
