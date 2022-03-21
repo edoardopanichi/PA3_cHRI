@@ -167,6 +167,7 @@ k = 1
 b = 1
 killCount = 0
 bulletCount = 0
+civilianCount = 0
 
 shooting = False # variable for the recoil, if true a recoil force is implemented
 recoil_duration = 0 # variable used later to select the duration of the force pulse
@@ -363,6 +364,7 @@ while run:
                 for civ in civilian_list:
                     if np.sqrt((xh[0]-int(civ.pos[0]))**2 + (xh[1] -int(civ.pos[1]))**2)<radius:
                         civ.hit()
+                        civilianCount += 1
                         
                 
                 #print(minDistanceList)
@@ -375,6 +377,7 @@ while run:
         setTimer = 0
         killCount = 0
         bulletCount = 0
+        civilianCount = 0
     
     # end timer
     if  time.perf_counter() >= timerEnd:
@@ -539,6 +542,7 @@ while run:
         score_saved = False
         kills_per_minute = killCount*(60/timeCountdown)
         bullets_per_minute = bulletCount*(60/timeCountdown)
+        civilians_per_minute = civilianCount*(60/timeCountdown)
         if bulletCount == 0: # to avoid errors due to the division by zero
             ResultSME = 100000000
         else:
@@ -580,7 +584,7 @@ while run:
         textKPMRect.center = (xc, yc-100) 
         window.blit(textKPM, textKPMRect)
         
-        textCPM = fontTable.render('Kills of civilians per minute: ' + str(0), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textCPM = fontTable.render('Kills of civilians per minute: ' + str(civilians_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textCPMRect = textCPM.get_rect()
         textCPMRect.center = (xc, yc-50) 
         window.blit(textCPM, textCPMRect)
