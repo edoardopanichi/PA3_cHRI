@@ -10,6 +10,7 @@ from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 from height_map import create_targets, create_civilians
 from save_scores import save_score
+import matplotlib.pyplot as plt
 
 ''' DESCRIPTION OF SOME VARIABLE OF THE CODE
 xh -> x and y coordinates of the haptic device or the mouse otherwise
@@ -170,7 +171,7 @@ recoil_duration = 0 # variable used later to select the duration of the force pu
 recoil_on = 0 # variable to activate or de-active recoil
 
 gun = "empty"
-timeCountdown = 15
+timeCountdown = 60
 
 # some variables needed to define the forces
 fe = np.zeros(2)
@@ -179,13 +180,13 @@ velocity_device = np.zeros(2)
 v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
-target_num = 3
+target_num = 1
 target_list=[]
 for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
-civilian_num = 2
+civilian_num = 1
 civilian_list=[]
 for i in range(civilian_num):
     civilian = Target(False)
@@ -376,7 +377,7 @@ while run:
     if gun == 'sniper':
         # define the features of the gun
         f_viscosity = 4*b*velocity_device
-        f_gravity = np.array([0, -10])
+        f_gravity = np.array([0, -5])
         
         if shooting or (recoil_duration > 0):
             f_recoil = np.array([0, 100])
@@ -490,16 +491,26 @@ while run:
     
     target_array = np.array(target_pos)
     civilian_array = np.array(civilian_pos)
-    print(target_array)
-    print(civilian_array)
     x_hm, y_hm, z_hm_targets = create_targets(window_dimension, target_array, weapon_n)
     x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array)
     z_hm = z_hm_targets + z_hm_civilians
-    gradient = np.array(np.gradient(z_hm))
-    f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1e6
     
-    fe =  f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
-    print("f_perturbance:", f_perturbance)
+    # Plot the 3D graph 
+    #fig3d = plt.figure()
+    #ax3d = fig3d.gca(projection='3d')
+    #ax3d.plot_surface(x_hm, y_hm, z_hm, cmap='viridis', linewidth=0)
+    #plt.show()
+    
+    gradient = np.array(np.gradient(z_hm))
+    if weapon_n != 0:
+        f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1.1 * 1e4 * 13**(weapon_n - 1)
+    else:
+        f_height_map = np.zeros(2)
+    
+    print(f_height_map)
+    
+    fe = f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
+    #print("f_perturbance:", f_perturbance)
     
 
     
