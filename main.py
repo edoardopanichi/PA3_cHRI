@@ -599,7 +599,7 @@ while run:
                         civilian_list.append(civilian)
                         
                 if event.key == ord('s') and score_saved==False:
-                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME)
+                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME,score)
                     score_saved = True
         
         # real-time plotting
