@@ -118,12 +118,16 @@ textDeactivateRedRect.center = (xc+69, yc+200)
 
 textScore = fontTitle.render('Score', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textScoreRect = textScore.get_rect()
-textScoreRect.center = (xc, yc-175) 
+textScoreRect.center = (xc, yc-200) 
 
 fontTable = pygame.font.Font('freesansbold.ttf', 20) # printing text font and font size
 textKPM = fontTable.render('Kills per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textKPMRect = textKPM.get_rect()
-textKPMRect.center = (xc, yc-50) 
+textKPMRect.center = (xc, yc-100) 
+
+textCPM = fontTable.render('Kills of civilians per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textCPMRect = textCPM.get_rect()
+textCPMRect.center = (xc, yc-50) 
 
 textBPM = fontTable.render('Bullets per minute:', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textBPMRect = textBPM.get_rect()
@@ -541,8 +545,13 @@ while run:
         
         textKPM = fontTable.render('Kills per minute: ' + str(kills_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textKPMRect = textKPM.get_rect()
-        textKPMRect.center = (xc, yc-50) 
+        textKPMRect.center = (xc, yc-100) 
         window.blit(textKPM, textKPMRect)
+        
+        textCPM = fontTable.render('Kills of civilians per minute: ' + str(0), True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textCPMRect = textCPM.get_rect()
+        textCPMRect.center = (xc, yc-50) 
+        window.blit(textCPM, textCPMRect)
         
         textBPM = fontTable.render('Bullets per minute: ' + str(bullets_per_minute), True, (0, 0, 0), (255, 255, 255)) # printing text object
         textBPMRect = textBPM.get_rect()
