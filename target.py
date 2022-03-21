@@ -10,7 +10,7 @@ class Target:
         else:
             self.moving_direction = np.array([random.choice([-1, 0, 1]), random.choice([-1, 0, 1])])
         self.speed = random.uniform(0.5, 1.5)
-        self.pos = np.array([random.uniform(50, 750), random.uniform(50, 300)])
+        self.pos = np.array([random.uniform(50, 750), random.uniform(50, 450)])
     
     def update_pos(self):
         self.pos += self.moving_direction * self.speed

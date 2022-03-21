@@ -187,13 +187,13 @@ velocity_device = np.zeros(2)
 v = np.random.rand(2) # random vector
 v_hat = v / np.linalg.norm(v) # random unit vector to choose the direction of the wind
 
-target_num = 3
+target_num = 1
 target_list=[]
 for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
-civilian_num = 2
+civilian_num = 4
 civilian_list=[]
 for i in range(civilian_num):
     civilian = Target(False)
@@ -587,7 +587,7 @@ while run:
                         civilian_list.append(civilian)
                         
                 if event.key == ord('s') and score_saved==False:
-                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME)
+                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME,score)
                     score_saved = True
         
         # real-time plotting
