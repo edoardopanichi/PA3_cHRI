@@ -13,7 +13,7 @@ def create_targets(frame_dimension, target_list, weapon):   # Function to create
     pos = np.dstack((x, y)) # Create array of position
     
     for i in range(target_list.shape[0]):
-        hole = multivariate_normal([target_list[i, 0], target_list[i, 1]], [[10 * 10**weapon, 0], [0, 10 * 10**weapon]])  # Create Gaussian for hole
+        hole = multivariate_normal([target_list[i, 0], target_list[i, 1]], [[10**weapon, 0], [0, 10**weapon]])  # Create Gaussian for hole
         z += - hole.pdf(pos)    # Get values for z
     
     return x, y, z
