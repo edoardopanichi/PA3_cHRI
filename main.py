@@ -10,6 +10,7 @@ from haply_code.pyhapi import Board, Device, Mechanisms
 from haply_code.pantograph import Pantograph
 from height_map import create_targets, create_civilians
 from save_scores import save_score
+import matplotlib.pyplot as plt
 
 ''' DESCRIPTION OF SOME VARIABLE OF THE CODE
 xh -> x and y coordinates of the haptic device or the mouse otherwise
@@ -62,11 +63,12 @@ imagePistolRect = imagePistol.get_rect ()
 imagePistolRect.center = (xc+250, yc+30)
 
 # Text
-font = pygame.font.Font('freesansbold.ttf', 15) # printing text font and font size
+font = pygame.font.Font('freesansbold.ttf', 18) # printing text font and font size
 textHits = font.render('Hits: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textHitsRect = textHits.get_rect()
 textHitsRect.topleft = (10, 30)
 
+fontCurrScore = pygame.font.Font('freesansbold.ttf', 25) # printing text font and font size
 textCurrScore = font.render('SCORE:     ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textCurrScoreRect = textCurrScore.get_rect()
 textCurrScoreRect.center = (xc, 15)  
@@ -178,7 +180,7 @@ recoil_duration = 0 # variable used later to select the duration of the force pu
 recoil_on = 0 # variable to activate or de-active recoil
 
 gun = "empty"
-timeCountdown = 15
+timeCountdown = 60
 
 # some variables needed to define the forces
 fe = np.zeros(2)
@@ -192,6 +194,7 @@ target_list=[]
 for i in range(target_num):
     target = Target(True)
     target_list.append(target)
+
 
 civilian_num = 4
 civilian_list=[]
@@ -399,7 +402,7 @@ while run:
     if gun == 'sniper':
         # define the features of the gun
         f_viscosity = 4*b*velocity_device
-        f_gravity = np.array([0, -10])
+        f_gravity = np.array([0, -5])
         
         if shooting or (recoil_duration > 0):
             f_recoil = np.array([0, 100])
@@ -456,7 +459,7 @@ while run:
     window.blit(imageBgd1, (0, 0))
     
     # plot time
-    textTime = font.render('Time: '+ str(countdown), True, (0, 0, 0))
+    textTime = font.render('Time: '+ str(countdown), True, (255, 0, 0))
     window.blit(textTime, textTimeRect)
     
     # plot kill count
@@ -464,7 +467,7 @@ while run:
     window.blit(textHits, textHitsRect)
     
     #plot current score
-    textCurrScore = font.render('Score: '+ str(score), True, (0, 0, 0))
+    textCurrScore = fontCurrScore.render('Score: '+ str(score), True, (255, 0, 0))
     window.blit(textCurrScore, textCurrScoreRect)
     
     # plot target
@@ -517,16 +520,26 @@ while run:
     
     target_array = np.array(target_pos)
     civilian_array = np.array(civilian_pos)
-    print(target_array)
-    print(civilian_array)
     x_hm, y_hm, z_hm_targets = create_targets(window_dimension, target_array, weapon_n)
     x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array)
     z_hm = z_hm_targets + z_hm_civilians
-    gradient = np.array(np.gradient(z_hm))
-    f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1e6
     
-    fe =  f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
-    print("f_perturbance:", f_perturbance)
+    # Plot the 3D graph 
+    #fig3d = plt.figure()
+    #ax3d = fig3d.gca(projection='3d')
+    #ax3d.plot_surface(x_hm, y_hm, z_hm, cmap='viridis', linewidth=0)
+    #plt.show()
+    
+    gradient = np.array(np.gradient(z_hm))
+    if weapon_n != 0:
+        f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1.1 * 1e4 * 13**(weapon_n - 1)
+    else:
+        f_height_map = np.zeros(2)
+    
+    print(f_height_map)
+    
+    fe = f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
+    #print("f_perturbance:", f_perturbance)
     
 
     

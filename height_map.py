@@ -13,7 +13,7 @@ def create_targets(frame_dimension, target_list, weapon):   # Function to create
     pos = np.dstack((x, y)) # Create array of position
     
     for i in range(target_list.shape[0]):
-        hole = multivariate_normal([target_list[i, 0], target_list[i, 1]], [[10**weapon, 0], [0, 10**weapon]])  # Create Gaussian for hole
+        hole = multivariate_normal([target_list[i, 0], target_list[i, 1]], [[200 * weapon**2 + 1, 0], [0, 200 * weapon**2 + 1]])  # Create Gaussian for hole
         z += - hole.pdf(pos)    # Get values for z
     
     return x, y, z
@@ -30,7 +30,7 @@ def create_civilians(frame_dimension, civilian_list):   # Function to create civ
     pos = np.dstack((x, y)) # Create array of position
     
     for i in range(civilian_list.shape[0]):
-        bump = multivariate_normal([civilian_list[i, 0], civilian_list[i, 1]], [[100, 0], [0, 100]])  # Create Gaussian for bump
+        bump = multivariate_normal([civilian_list[i, 0], civilian_list[i, 1]], [[200, 0], [0, 200]])  # Create Gaussian for bump
         z += bump.pdf(pos)  # Get values for z
     
     return x, y, z
