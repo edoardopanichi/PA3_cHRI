@@ -195,7 +195,7 @@ for i in range(target_num):
     target = Target(True)
     target_list.append(target)
 
-civilian_num = 1
+civilian_num = 4
 civilian_list=[]
 for i in range(civilian_num):
     civilian = Target(False)
