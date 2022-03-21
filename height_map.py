@@ -29,7 +29,7 @@ def create_civilians(frame_dimension, civilian_list):   # Function to create civ
     z = 0   # Initialize z
     pos = np.dstack((x, y)) # Create array of position
     
-    for i in range(target_list.shape[0]):
+    for i in range(civilian_list.shape[0]):
         bump = multivariate_normal([civilian_list[i, 0], civilian_list[i, 1]], [[100, 0], [0, 100]])  # Create Gaussian for bump
         z += bump.pdf(pos)  # Get values for z
     
