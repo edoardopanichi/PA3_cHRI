@@ -180,7 +180,7 @@ recoil_duration = 0 # variable used later to select the duration of the force pu
 recoil_on = 0 # variable to activate or de-active recoil
 
 gun = "empty"
-timeCountdown = 60
+timeCountdown = 30
 
 # some variables needed to define the forces
 fe = np.zeros(2)
@@ -535,7 +535,7 @@ while run:
     else:
         f_height_map = np.zeros(2)
     
-    print(f_height_map)
+    #print(f_height_map)
     
     fe = f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
     #print("f_perturbance:", f_perturbance)

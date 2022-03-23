@@ -15,7 +15,7 @@ STEPS TO IMPLEMENT THE PROJECT:
 PERFORMANCE METRICS:
 - kill per minute (average time per kill)
 - bullets per kill
-- SME from teh center of the heads
+- SME from the center of the heads
 
 FEATURES:
 - Bumps and holes for target and hostages
