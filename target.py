@@ -26,8 +26,7 @@ class Target:
         self.speed = random.uniform(0.5, 1.5)
         self.pos = np.array([random.uniform(50, 750), random.uniform(50, 300)])
     
-    def printamelo(self):
-        print(self.pos, self.speed, self.moving_direction)
+    
     
     
     
