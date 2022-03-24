@@ -25,10 +25,9 @@ window.fill((255,255,255)) # white background
 xc, yc = window.get_rect().center # window center
 target_radius = 25
 
+
 # Images 
 pygame.display.set_caption('shooting targets')
-imageTerrorist = pygame.image.load('image/terrorist.png')
-imageTerrorist = pygame.transform.scale(imageTerrorist, (2*target_radius, 2*target_radius))
 
 imageTarget = pygame.image.load('image/target.png') 
 imageTarget = pygame.transform.scale(imageTarget, (2*target_radius, 2*target_radius))
@@ -40,7 +39,7 @@ imageBgd1 = pygame.image.load('image/background1.jpg')
 imageBgd1 = pygame.transform.scale(imageBgd1, (800, 600))
 
 crossSize = 65  # int
-imageCross = pygame.image.load('image/cross2.png')
+imageCross = pygame.image.load('image/cross1.png')
 imageCross = pygame.transform.scale(imageCross, (crossSize, crossSize))
 
 factor = 0.7  # factor to scale image
@@ -62,20 +61,25 @@ imagePistolSmall = pygame.transform.scale(imagePistol, (int(factor*110), int(fac
 imagePistolRect = imagePistol.get_rect ()
 imagePistolRect.center = (xc+250, yc+30)
 
+
 # Text
 font = pygame.font.Font('freesansbold.ttf', 18) # printing text font and font size
-textHits = font.render('Hits: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textTime = font.render('Time: ', True, (255, 0, 0)) # printing text object
+textTimeRect = textTime.get_rect()
+textTimeRect.topleft = (10, 10) 
+
+textHits = font.render('Hits: ', True, (255, 0, 0)) # printing text object
 textHitsRect = textHits.get_rect()
 textHitsRect.topleft = (10, 30)
+
+textShoot = font.render('Press \'SPACE\' to shoot', True, (0, 0, 0)) # printing text object
+textShootRect = textShoot.get_rect()
+textShootRect.center = (xc, 580)
 
 fontCurrScore = pygame.font.Font('freesansbold.ttf', 25) # printing text font and font size
 textCurrScore = font.render('SCORE:     ', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textCurrScoreRect = textCurrScore.get_rect()
 textCurrScoreRect.center = (xc, 15)  
-
-textTime = font.render('Time: ', True, (0, 0, 0), (255, 255, 255)) # printing text object
-textTimeRect = textTime.get_rect()
-textTimeRect.topleft = (10, 10) 
 
 fontTitle = pygame.font.Font('freesansbold.ttf', 50) # printing text font and font size
 title = fontTitle.render('Gun simulation', True, (0, 0, 0), (255, 255, 255)) # printing text object
@@ -115,15 +119,9 @@ textRecoilRect.center = (xc, yc+200)
 textActivateGreen = fontGun.render('activate', True, (0, 255, 0), (255, 255, 255)) # printing text object
 textActivateGreenRect = textActivateGreen.get_rect()
 textActivateGreenRect.center = (xc-32, yc+200)
-textActivateRed = fontGun.render('activate', True, (255, 0, 0), (255, 255, 255)) # printing text object
-textActivateRedRect = textActivateRed.get_rect()
-textActivateRedRect.center = (xc-32, yc+200)
 textDeactivateGreen = fontGun.render('de-activate', True, (0, 255, 0), (255, 255, 255)) # printing text object
 textDeactivateGreenRect = textDeactivateGreen.get_rect()
 textDeactivateGreenRect.center = (xc+69, yc+200)
-textDeactivateRed = fontGun.render('de-activate', True, (255, 0, 0), (255, 255, 255)) # printing text object
-textDeactivateRedRect = textDeactivateRed.get_rect()
-textDeactivateRedRect.center = (xc+69, yc+200)
 
 textScore = fontTitle.render('Score', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textScoreRect = textScore.get_rect()
@@ -142,9 +140,9 @@ textBPM = fontTable.render('Bullets per minute:', True, (0, 0, 0), (255, 255, 25
 textBPMRect = textBPM.get_rect()
 textBPMRect.center = (xc, yc)  
 
-textSME = fontTable.render('SME from target center:', True, (0, 0, 0), (255, 255, 255)) # printing text object
-textSMERect = textSME.get_rect()
-textSMERect.center = (xc, yc+50) 
+textMAE = fontTable.render('MAE from target center:', True, (0, 0, 0), (255, 255, 255)) # printing text object
+textMAERect = textMAE.get_rect()
+textMAERect.center = (xc, yc+50) 
 
 textRestart = fontTable.render('Press \'z\' for restart', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textRestartRect = textRestart.get_rect()
@@ -153,6 +151,7 @@ textRestartRect.center = (xc, yc+150)
 textSave = fontTable.render('Press \'s\' to save score', True, (0, 0, 0), (255, 255, 255)) # printing text object
 textSaveRect = textSave.get_rect()
 textSaveRect.center = (xc, yc+200)
+
 
 window_scale = 3 # conversion from meters to pixels. Not sure if we need it
 
@@ -165,12 +164,9 @@ FPS = int(1 / dts)
 x_rand = random.randint(50, 750)
 y_rand = random.randint(50, 300)
 
-radius = 25
-count = 0
-
-
 k = 1
 b = 1
+radius = 25
 killCount = 0
 bulletCount = 0
 civilianCount = 0
@@ -273,7 +269,6 @@ while run:
                         recoil_on = 0
                     else:
                         recoil_on = 1  
-                    
                 if event.key == ord('s'): # select sniper
                     setTimer = 1
                     gun = "sniper"
@@ -308,20 +303,19 @@ while run:
         window.blit(textRecoil, textRecoilRect)
         if recoil_on == 1:  #recoil is activated
             window.blit(textActivateGreen, textActivateGreenRect)
-            #window.blit(textDeactivateRed, textDeactivateRedRect)
         else:  #recoil is de-activated
-            #window.blit(textActivateRed, textActivateRedRect)
             window.blit(textDeactivateGreen, textDeactivateGreenRect)
         
         # plot images
         window.blit(imageSniper, imageSniperRect)
         window.blit(imageRifle, imageRifleRect)
         window.blit(imagePistol, imagePistolRect)
-        #window.blit(image, (xc-25, yc-150))
+        
         pygame.display.flip() # update display
     '''*********** !STARTSCREEN ***********'''    
     
-    if run == False:
+    # quit loop if window has been closed
+    if run == False:  
         break
     
     '''ACQUIRING THE POSITION FROM THE HAPLY IF CONNECTED, FROM THE MOUSE OTHERWISE'''
@@ -381,8 +375,7 @@ while run:
                 
                 if not hit_smth:
                     score -= 20
-
-                    
+           
     # start timer
     if setTimer == 1:
         timerStart = time.perf_counter()
@@ -452,7 +445,6 @@ while run:
         imageGunRect.topright = (795, 5)
         weapon_n = 0
     
-    
     # real-time plotting
     window.fill((255,255,255)) # clear window
     window.blit(imageBgd1, (0, 0))
@@ -469,12 +461,11 @@ while run:
     textCurrScore = fontCurrScore.render('Score: '+ str(score), True, (255, 0, 0))
     window.blit(textCurrScore, textCurrScoreRect)
     
+    window.blit(textShoot, textShootRect)
+    
     # plot target
-    #pygame.draw.circle(window, (0, 255, 0), (x_rand, y_rand), radius)
     target_pos=[]
     for target in target_list:
-        #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-        #target.update_pos()
         x_pos = int(target.pos[0])
         y_pos = int(target.pos[1])
         if 800-x_pos<1+target_radius  or x_pos<1+target_radius:
@@ -487,8 +478,6 @@ while run:
 
     civilian_pos=[]
     for civilian in civilian_list:
-        #pygame.draw.circle(window, (0, 255, 0), np.round(target.pos), radius)
-        #target.update_pos()
         x_pos = int(civilian.pos[0])
         y_pos = int(civilian.pos[1])
         if 800 - x_pos < 1 + target_radius or x_pos < 1 + target_radius:
@@ -498,13 +487,9 @@ while run:
         civilian.update_pos()
         civilian_pos.append(civilian.pos)
         window.blit(imageCivilian, (x_pos - target_radius, y_pos - target_radius))
-        
-    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
-    
-    
-    
+          
     window.blit(imageCross, (xh[0]-crossSize/2, xh[1]-crossSize/2))
-    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 3) # draw a green point for aiming
+    pygame.draw.circle(window, (0, 255, 0), (xh[0], xh[1]), 5) # draw a green point for aiming
     window.blit(imageGun, imageGunRect)
     pygame.display.flip() # update display
     
@@ -523,29 +508,19 @@ while run:
     x_hm, y_hm, z_hm_civilians = create_civilians(window_dimension, civilian_array)
     z_hm = z_hm_targets + z_hm_civilians
     
-    # Plot the 3D graph 
-    #fig3d = plt.figure()
-    #ax3d = fig3d.gca(projection='3d')
-    #ax3d.plot_surface(x_hm, y_hm, z_hm, cmap='viridis', linewidth=0)
-    #plt.show()
-    
     gradient = np.array(np.gradient(z_hm))
     if weapon_n != 0:
         f_height_map = gradient[:, int(xh[0]/5), int(xh[1]/5)] * 1.1 * 1e4 * 13**(weapon_n - 1)
     else:
         f_height_map = np.zeros(2)
-    
     #print(f_height_map)
     
     fe = f_viscosity + (f_recoil * recoil_on) + f_gravity + f_perturbance + f_height_map
     #print("f_perturbance:", f_perturbance)
     
-
-    
-    
     xh_old = xh # Update xh_old to compute the velocity
     
-     ######### Send forces to the device #########
+    ######### Send forces to the device #########
     if port:
         fe[1] = -fe[1]  ##Flips the force on the Y=axis 
         
@@ -554,28 +529,20 @@ while run:
         device.device_write_torques()
         #pause for 1 millisecond
         time.sleep(0.001)
-        
-    # else:
-    #     ######### Update the positions according to the forces ########
-    #     ##Compute simulation (here there is no inertia)
-    #     ##If the haply is connected xm=xh and dxh = 0
-    #     dxh = (k/b*(xm-xh)/window_scale - fe/b)    ####replace with the valid expression that takes all the forces into account
-    #     dxh = dxh*window_scale
-    #     xh = np.round(xh+dxh)             ##update new position of the end effector
-    
-    
     '''************* !TASK *************'''
-    if endscreen:
+    
+    if endscreen:  # calculate metrics
         score_saved = False
         kills_per_minute = killCount*(60/timeCountdown)
         bullets_per_minute = bulletCount*(60/timeCountdown)
         civilians_per_minute = civilianCount*(60/timeCountdown)
         if bulletCount == 0: # to avoid errors due to the division by zero
-            ResultSME = 100000000
+            ResultMAE = 100000000
         else:
-            ResultSME =  round(sum(minDistanceList)/bulletCount, 2)
+            ResultMAE =  round(sum(minDistanceList)/bulletCount, 2)
             
-        score = score + int(3*1e4/ResultSME)
+        score = score + int(3*1e4/ResultMAE)
+        
     '''*********** ENDSCRREEN ***********'''
     while endscreen:  
         for event in pygame.event.get(): # interrupt function
@@ -599,7 +566,7 @@ while run:
                         civilian_list.append(civilian)
                         
                 if event.key == ord('s') and score_saved==False:
-                    save_score(gun,kills_per_minute,bullets_per_minute,ResultSME,score)
+                    save_score(gun,kills_per_minute,bullets_per_minute,ResultMAE,score)
                     score_saved = True
         
         # real-time plotting
@@ -626,20 +593,16 @@ while run:
         textBPMRect.center = (xc, yc)  
         window.blit(textBPM, textBPMRect)
         
-        
-        textSME = fontTable.render('SME from target center: ' + str(ResultSME) + ' [in pixel]', True, (0, 0, 0), (255, 255, 255)) # printing text object
-        textSMERect = textSME.get_rect()
-        textSMERect.center = (xc, yc+50)
-        window.blit(textSME, textSMERect)
+        textMAE = fontTable.render('MAE from target center: ' + str(ResultMAE) + ' [in pixel]', True, (0, 0, 0), (255, 255, 255)) # printing text object
+        textMAERect = textMAE.get_rect()
+        textMAERect.center = (xc, yc+50)
+        window.blit(textMAE, textMAERect)
         
         window.blit(textRestart, textRestartRect)
         window.blit(textSave, textSaveRect)
         
-        # plot images
-        
         pygame.display.flip() # update display
     '''*********** !ENDSCREEN ***********'''
-    
     
     # try to keep it real time with the desired step time
     clock.tick(FPS)

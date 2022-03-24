@@ -15,11 +15,5 @@ https://www.pngfind.com/download/hhTJbo_best-free-sniper-rifle-png-image-without
 rifle1:
 https://pixabay.com/vectors/rifle-automatic-gun-weapon-arms-147354/
 
-rifle2:
-https://pixabay.com/vectors/m16-ar-15-rifle-gun-shoot-arms-4397889/
-
 pistol1:
 https://pixabay.com/vectors/bullets-firearm-gun-pistol-2023220/
-
-pistol2:
-https://pixabay.com/vectors/beretta-pistol-gun-handgun-weapon-906612/
